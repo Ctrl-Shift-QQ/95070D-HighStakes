@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include <iostream>
+#include <vector>
 
 using namespace vex;
 
@@ -17,90 +18,147 @@ competition Competition;
 
 
 typedef enum {
-    AutonNone = 0,
-
+  AutonNone = 0,
+  AutonRedSolo,
+  AutonRedLeft,
+  AutonRedRight,
+  AutonRedRush,
+  AutonBlueSolo,
+  AutonBlueLeft,
+  AutonBlueRight,
+  AutonBlueRush,
 } Auton; //Enum for each of the autons
 
 static Auton currentAuton = AutonNone;
 
 void preAuton(){
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
 
-    //Inertial Calibration
-    Controller1.Screen.setCursor(2, 6);
-    Inertial.calibrate();
-    Controller1.Screen.print("CALIBRATING!!!");
-    wait(3, sec);
-    Controller1.Screen.clearScreen();
+  //Inertial Calibration
+  Controller1.Screen.setCursor(2, 6);
+  Inertial.calibrate();
+  Controller1.Screen.print("CALIBRATING!!!");
+  wait(3, sec);
+  Controller1.Screen.clearScreen();
 
-    //Auton Selector
-    bool runningSelector = true;
+  //Auton Selector
+  bool selectingSide = true;
+  bool redAlliance; //False = Red, True = Blue
+  bool selectingAuton = true;
+  bool buttonLeftWasPressing = false;
+  bool buttonRightWasPressing = false;
 
-    int columns[] = {};
-    std::string autonNames[] = {};
-    Auton autons[] = {};
+  while (selectingSide){
+    Controller1.Screen.setCursor(1, 5);
+    Controller1.Screen.print("Alliance Color");
+    Controller1.Screen.setCursor(3, 1);
+    Controller1.Screen.print("Red");
+    Controller1.Screen.setCursor(3, 9);
+    Controller1.Screen.print("Blue");
 
-    bool buttonLeftPressed;
-    bool buttonRightPressed;
+    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Pressing left button to select red alliance
+      redAlliance = true;
+      Controller1.Screen.setCursor(3, 3);
 
-    while (runningSelector){
+      buttonLeftWasPressing = true;
+    }
+    else if (!Controller1.ButtonLeft.pressing() && buttonLeftWasPressing){
+      buttonLeftWasPressing = false;
+    }
+
+    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Pressing right button to select blue alliance
+      redAlliance = false;
+      Controller1.Screen.setCursor(3, 14);
+
+      buttonRightWasPressing = true;
+    }
+    else if (!Controller1.ButtonLeft.pressing() && buttonLeftWasPressing){
+      buttonLeftWasPressing = false;
+    }
+
+    if (Controller1.ButtonUp.pressing()){
+      Controller1.Screen.clearScreen();
+      selectingSide = false;
+    }
+  }
+  wait(50, msec);
+  Controller1.rumble("-.-.");
+
+  int columns[] = {5, 6, 5, 2, 4, 3};
+  std::string autonNames[] = {"Solo AWP", "Left-Side AWP", "Right-Side AWP", "Goal Rush"};
+  Auton redAutons[] = {AutonRedSolo, AutonRedLeft, AutonRedRight, AutonRedRush};
+  Auton blueAutons[] = {AutonBlueSolo, AutonBlueLeft, AutonBlueRight, AutonBlueRush};
+
+  while (selectingAuton){
     if (currentAuton == AutonNone){
-        Controller1.Screen.setCursor(2, 3);
-        Controller1.Screen.print("No Auton Selected");
+      Controller1.Screen.setCursor(2, 3);
+      Controller1.Screen.print("No Auton Selected");
     }
-    else{
-        Controller1.Screen.setCursor(1, 5);
-        Controller1.Screen.print("Auton Selected:");
+    else {
+      Controller1.Screen.setCursor(1, 5);
+      Controller1.Screen.print("Auton Selected:");
     }
 
-    for (int i = 0; i < 10; i++){
-        if (currentAuton == autons[i]){ //Displays auton label
-        Controller1.Screen.setCursor(3, columns[i]);
-        Controller1.Screen.print(autonNames[i].c_str());
+    Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - 1]);
+    Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - 1].c_str());
+
+    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Pressing left button go left on auton list
+      Controller1.Screen.clearScreen();
+
+      if (redAlliance){
+        if (currentAuton == AutonNone || currentAuton == redAutons[0]){
+          currentAuton = redAutons[sizeof(redAutons) - 1];
         }
-    }
-
-    if (Controller1.ButtonLeft.pressing() && !buttonLeftPressed){ //Pressing left button go left on auton list
-        Controller1.Screen.clearScreen();
-        if (currentAuton == AutonNone || currentAuton == AutonNone){
-        currentAuton = AutonNone;
+        else {
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
         }
-        else{
-        currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
+      }
+      else {
+        if (currentAuton == AutonNone || currentAuton == blueAutons[0]){
+          currentAuton = blueAutons[sizeof(redAutons) - 1];
         }
-
-        buttonLeftPressed = true;
-    }
-    if (!Controller1.ButtonLeft.pressing() && buttonLeftPressed){
-        buttonLeftPressed = false;
-    }
-
-    if (Controller1.ButtonRight.pressing() && !buttonRightPressed){ //Pressing right button go left on auton list
-        Controller1.Screen.clearScreen();
-        if (currentAuton == AutonNone){
-        currentAuton = AutonNone;
+        else {
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
         }
-        else{
-        currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
+      }
+      
+      buttonLeftWasPressing = true;
+    }
+    if (!Controller1.ButtonLeft.pressing() && buttonLeftWasPressing){
+      buttonLeftWasPressing = false;
+    }
+
+    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Pressing right button go left on auton list
+      Controller1.Screen.clearScreen();
+      if (redAlliance){
+        if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) - 1]){
+          currentAuton = redAutons[0];
         }
+        else {
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
+        }
+      }
+      else {
+        if (currentAuton == AutonNone || currentAuton == blueAutons[sizeof(redAutons) - 1]){
+          currentAuton = blueAutons[0];
+        }
+        else {
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
+        }
+      }
 
-        buttonRightPressed = true;
+      buttonLeftWasPressing = true;
     }
-    if (!Controller1.ButtonRight.pressing() && buttonRightPressed){
-        buttonRightPressed = false; 
+    if (!Controller1.ButtonRight.pressing() && buttonRightWasPressing){
+      buttonRightWasPressing = false; 
     }
+}
 
-    if (Controller1.ButtonUp.pressing()){ //Exits selector when up button is pressed
-        Controller1.Screen.clearScreen();
-        runningSelector = false;
-    }
-
-    wait(50, msec);
-    }
-    Controller1.rumble("-.-.");
 }
 
 void autonomous(){
-    double startTime = Brain.Timer.time(); //Records start time
+  double startTime = Brain.Timer.time(); //Records start time
   Controller1.Screen.setCursor(2, 6);
 
   switch (currentAuton){
@@ -116,14 +174,23 @@ void autonomous(){
   Controller1.Screen.print(" Seconds");
 }
 
-void driverControl(){
-    while (true){
-        
-    }
+void usercontrol(){
+  Intake.setVelocity(90, percent);
+  while (true){
+      if (Controller1.ButtonR1.pressing()){
+        Intake.spin(forward);
+      }
+      else if (Controller1.ButtonR2.pressing()){
+        Intake.spin(reverse);
+      }
+      else {
+        Intake.stop();
+      }
+  }
 }
 
 int main(){
-  Competition.drivercontrol(driverControl);
+  Competition.drivercontrol(usercontrol);
   Competition.autonomous(autonomous);
 
   preAuton();
@@ -132,3 +199,5 @@ int main(){
     wait(20, msec);
   }
 }
+
+/*SKIBIDI TOILET!!!!!!11!!11!!!11!11!!1111!!1!1!!11!111!1!!11!11!!*/

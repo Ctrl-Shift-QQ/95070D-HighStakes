@@ -18,10 +18,14 @@ motor LeftMiddle = motor(PORT10, ratio6_1, true);
 motor LeftBack = motor(PORT19, ratio6_1, true);
 motor RightFront = motor(PORT14, ratio6_1, false);
 motor RightMiddle = motor(PORT17, ratio6_1, false);
-motor RightBack = motor(PORT1, ratio6_1, false);
+motor RightBack = motor(PORT11, ratio6_1, false);
 motor_group LeftDrive(LeftFront, LeftMiddle, LeftBack);
 motor_group RightDrive(RightFront, RightMiddle, RightBack);
+motor FirstIntake = motor(PORT1, ratio18_1, false);
+motor SecondIntake = motor(PORT2, ratio18_1, true);
+motor_group Intake(FirstIntake, SecondIntake);
 inertial Inertial = inertial(PORT16);
+digital_out MogoMech = digital_out(Brain.ThreeWirePort.A);
 
 
 // VEXcode generated functions

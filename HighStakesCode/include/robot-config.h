@@ -12,7 +12,11 @@ extern motor RightMiddle;
 extern motor RightBack;
 extern motor_group LeftDrive;
 extern motor_group RightDrive;
+extern motor FirstIntake;
+extern motor SecondIntake;
+extern motor_group Intake;
 extern inertial Inertial;
+extern digital_out MogoMech;
 
 
 /**
