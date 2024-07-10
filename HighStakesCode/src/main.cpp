@@ -8,7 +8,6 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include <iostream>
-#include <vector>
 
 using namespace vex;
 
@@ -36,6 +35,7 @@ void preAuton(){
   vexcodeInit();
 
   //Inertial Calibration
+  Controller1.Screen.clearScreen();
   Controller1.Screen.setCursor(2, 6);
   Inertial.calibrate();
   Controller1.Screen.print("CALIBRATING!!!");
@@ -44,17 +44,17 @@ void preAuton(){
 
   //Auton Selector
   bool selectingSide = true;
-  bool redAlliance; //False = Red, True = Blue
+  bool redAlliance; //True = Red, False = Blue
   bool selectingAuton = true;
   bool buttonLeftWasPressing = false;
   bool buttonRightWasPressing = false;
 
   while (selectingSide){
-    Controller1.Screen.setCursor(1, 5);
+    Controller1.Screen.setCursor(1, 6);
     Controller1.Screen.print("Alliance Color");
     Controller1.Screen.setCursor(3, 1);
     Controller1.Screen.print("Red");
-    Controller1.Screen.setCursor(3, 9);
+    Controller1.Screen.setCursor(3, 17);
     Controller1.Screen.print("Blue");
 
     if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Pressing left button to select red alliance
@@ -83,9 +83,9 @@ void preAuton(){
     }
   }
   wait(50, msec);
-  Controller1.rumble("-.-.");
+  Controller1.rumble("-");
 
-  int columns[] = {5, 6, 5, 2, 4, 3};
+  int columns[] = {7, 5, 5, 7};
   std::string autonNames[] = {"Solo AWP", "Left-Side AWP", "Right-Side AWP", "Goal Rush"};
   Auton redAutons[] = {AutonRedSolo, AutonRedLeft, AutonRedRight, AutonRedRush};
   Auton blueAutons[] = {AutonBlueSolo, AutonBlueLeft, AutonBlueRight, AutonBlueRush};
@@ -153,8 +153,15 @@ void preAuton(){
     if (!Controller1.ButtonRight.pressing() && buttonRightWasPressing){
       buttonRightWasPressing = false; 
     }
-}
 
+    if (Controller1.ButtonUp.pressing()){
+      Controller1.Screen.clearScreen();
+      selectingSide = false;
+    }
+  }
+
+  wait(50, msec);
+  Controller1.rumble("-.-.");
 }
 
 void autonomous(){
@@ -177,15 +184,27 @@ void autonomous(){
 void usercontrol(){
   Intake.setVelocity(90, percent);
   while (true){
-      if (Controller1.ButtonR1.pressing()){
-        Intake.spin(forward);
-      }
-      else if (Controller1.ButtonR2.pressing()){
-        Intake.spin(reverse);
-      }
-      else {
-        Intake.stop();
-      }
+    if (Controller1.ButtonR1.pressing()){
+      Intake.spin(forward);
+    }
+    else if (Controller1.ButtonR2.pressing()){
+      Intake.spin(reverse);
+    }
+    else {
+      Intake.stop();
+    }
+
+    static bool pistonExtended;
+    static bool buttonPressed;
+
+    if (Controller1.ButtonA.pressing() && !buttonPressed){ //Button pressed
+      buttonPressed = true;
+      pistonExtended = !pistonExtended; //Changes piston direction to opposite
+      MogoMech.set(pistonExtended);
+    }
+    if (!Controller1.ButtonA.pressing() && buttonPressed){ //Button released
+      buttonPressed = false;
+    }
   }
 }
 
@@ -199,5 +218,3 @@ int main(){
     wait(20, msec);
   }
 }
-
-/*SKIBIDI TOILET!!!!!!11!!11!!!11!11!!1111!!1!1!!11!111!1!!11!11!!*/
