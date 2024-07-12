@@ -1,15 +1,16 @@
 #include "vex.h"
-#include <iostream>
 
 class odom {
     private:
         double sidewaysTrackerValue;
         double forwardTrackerValue;
+        double sidewaysToCenterDistance;
+        double forwardToCenterDistance;
     public:
-        double xPosition;
-        double yPosition;
-        double orientation;
-        void setPosition();
+        double xPosition; //Inches
+        double yPosition; //Inches
+        double orientation; //Degrees
+        void setTrackerToCenterDistances(double sidewaysToCenterDistance, double forwardToCenterDistance);
+        void setPosition(double xPosition, double yPosition, double orientation);
         void updatePosition();
-        void setTrackerToCenterDistances();
 };
