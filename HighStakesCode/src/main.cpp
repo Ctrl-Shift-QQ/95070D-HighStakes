@@ -7,6 +7,7 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
+#include "controls.h"
 #include "autons.h"
 #include <iostream>
 
@@ -67,8 +68,8 @@ void preAuton(){
       Controller1.Screen.setCursor(3, 18);
       Controller1.Screen.print("Blue x");
     }
-
-    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Pressing left button to select red alliance
+    
+    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Press left button to select red alliance
       redAlliance = true;
 
       buttonLeftWasPressing = true;
@@ -77,7 +78,7 @@ void preAuton(){
       buttonLeftWasPressing = false;
     }
 
-    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Pressing right button to select blue alliance
+    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Press right button to select blue alliance
       redAlliance = false;
 
       buttonRightWasPressing = true;
@@ -86,7 +87,7 @@ void preAuton(){
       buttonRightWasPressing = false;
     }
 
-    if (Controller1.ButtonUp.pressing()){
+    if (Controller1.ButtonUp.pressing()){ //Press up button to select
       Controller1.Screen.clearScreen();
 
       selectingSide = false;
@@ -122,7 +123,7 @@ void preAuton(){
       }
     }
   
-    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Pressing left button go left on auton list
+    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Press left button go left on auton list
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
@@ -148,7 +149,7 @@ void preAuton(){
       buttonLeftWasPressing = false;
     }
 
-    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Pressing right button go left on auton list
+    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Press right button go left on auton list
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
@@ -174,10 +175,10 @@ void preAuton(){
       buttonRightWasPressing = false; 
     }
 
-    if (Controller1.ButtonUp.pressing()){
+    if (Controller1.ButtonUp.pressing()){ //Press up button to select
       Controller1.Screen.clearScreen();
 
-      selectingSide = false;
+      selectingAuton = false;
     }
     
     wait(20, msec);
@@ -189,7 +190,6 @@ void preAuton(){
 
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
-  Controller1.Screen.setCursor(2, 6);
 
   switch (currentAuton){
     case AutonNone: {
@@ -202,19 +202,19 @@ void autonomous(){
       runAutonRedLeft();
     }
     case AutonRedRight: {
-      runAutonRedRight;
+      runAutonRedRight();
     }
     case AutonRedRush: {
-      runAutonRedRush;
+      runAutonRedRush();
     }
     case AutonBlueSolo: {
-      runAutonBlueSolo;
+      runAutonBlueSolo();
     }
     case AutonBlueLeft: {
-      runAutonBlueLeft;
+      runAutonBlueLeft();
     }
     case AutonBlueRight: {
-      runAutonBlueRight;
+      runAutonBlueRight();
     }
     case AutonBlueRush: {
       runAutonBlueRush();
@@ -224,37 +224,19 @@ void autonomous(){
     }
   }
 
+  Controller1.Screen.setCursor(2, 6);
   Controller1.Screen.print((Brain.Timer.time() - startTime) / 1000); //Records time spent
   Controller1.Screen.print(" Seconds");
 }
 
 void usercontrol(){
-  Intake.setVelocity(90, percent);
   while (true){
-      if (Controller1.ButtonR1.pressing()){
-        Intake.spin(forward);
-      }
-      else if (Controller1.ButtonR2.pressing()){
-        Intake.spin(reverse);
-      }
-      else {
-        Intake.stop();
-      }
-      
-    static bool pistonExtended;
-    static bool buttonPressed;
-
-    if (Controller1.ButtonA.pressing() && !buttonPressed){ //Button pressed
-      buttonPressed = true;
-      pistonExtended = !pistonExtended; //Changes piston direction to opposite
-      MogoMech.set(pistonExtended);
-    }
-    if (!Controller1.ButtonA.pressing() && buttonPressed){ //Button released
-      buttonPressed = false;
-    }
-
-    LeftDrive.spin(forward, Controller1.Axis3.position(percent) + Controller1.Axis1.position(percent)/2, percent);
-    RightDrive.spin(forward, Controller1.Axis3.position(percent) - Controller1.Axis1.position(percent)/2, percent);
+    runTankDrive(100);
+    runIntake();
+    runMogo();
+    runRedirect();
+    
+    wait(20, msec);
   }
 }
 
@@ -264,7 +246,7 @@ int main(){
 
   preAuton();
 
-  while(true){
+  while (true){
     wait(20, msec);
   }
 }

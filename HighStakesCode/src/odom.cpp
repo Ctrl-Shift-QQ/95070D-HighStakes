@@ -2,7 +2,8 @@
 #include "odom.h"
 #include <iostream>
 
-void odom::setTrackerToCenterDistances(double sidewaysToCenterDistance, double forwardToCenterDistance){
+void odom::setPhysicalMeasurements(double wheelSize, double sidewaysToCenterDistance, double forwardToCenterDistance){
+    this->wheelSize = wheelSize;
     this->sidewaysToCenterDistance = sidewaysToCenterDistance;
     this->forwardToCenterDistance = forwardToCenterDistance;
 }
@@ -13,6 +14,7 @@ void odom::setPosition(double xPosition, double yPosition, double orientation){
     this->orientation = orientation;
 }
 
-void odom::updatePosition(){ 
-    
+void odom::updatePosition(){
+    double currentSidewaysTrackerValue = sidewaysTrackerValue;
+    double currentForwardTrackerValue = forwardTrackerValue;
 }

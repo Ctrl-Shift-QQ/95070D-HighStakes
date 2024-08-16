@@ -1,7 +1,5 @@
 #include "vex.h"
 
-/********** Autons **********/
-
 void runAutonRedSolo();
 void runAutonRedLeft();
 void runAutonRedRight();
