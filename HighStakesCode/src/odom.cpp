@@ -15,6 +15,17 @@ void odom::setPosition(double xPosition, double yPosition, double orientation){
 }
 
 void odom::updatePosition(){
-    double currentSidewaysTrackerValue = sidewaysTrackerValue;
-    double currentForwardTrackerValue = forwardTrackerValue;
+    //Saves values so that they don't change during the same cycle
+    double sidewaysTrackerPosition = SidewaysTracker.position(turns);
+    double forwardTrackerPosition = ForwardTracker.position(turns);
+
+    double sidewaysPositionDelta = (SidewaysTracker.position(turns) - sidewaysTrackerPosition) * 2.75 * M_PI; //Gets change in inches (position variable is value from last cycle)
+    double forwardPositionDelta = (ForwardTracker.position(turns) - forwardTrackerPosition) * 2.75 * M_PI;
+    
+    double currentSidewaysTrackerValue = sidewaysTrackerPosition;
+    double currentForwardTrackerValue = forwardTrackerPosition;
+    double localXPosition;
+    double localYposition;
+    double localPlaneOffset;
+    
 }

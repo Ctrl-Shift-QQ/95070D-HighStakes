@@ -48,8 +48,6 @@ void preAuton(){
   bool selectingSide = true;
   bool redAlliance; //True = Red, False = Blue
   bool selectingAuton = true;
-  bool buttonLeftWasPressing = false;
-  bool buttonRightWasPressing = false;
 
   while (selectingSide){ //Selects the alliance color
     Controller1.Screen.clearScreen();
@@ -69,22 +67,12 @@ void preAuton(){
       Controller1.Screen.print("Blue x");
     }
     
-    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Press left button to select red alliance
+    if (pressed(Left)){ //Press left button to select red alliance
       redAlliance = true;
-
-      buttonLeftWasPressing = true;
-    }
-    else if (!Controller1.ButtonLeft.pressing() && buttonLeftWasPressing){
-      buttonLeftWasPressing = false;
     }
 
-    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Press right button to select blue alliance
+    if (pressed(Right)){ //Press right button to select blue alliance
       redAlliance = false;
-
-      buttonRightWasPressing = true;
-    }
-    else if (!Controller1.ButtonRight.pressing() && buttonRightWasPressing){
-      buttonRightWasPressing = false;
     }
 
     if (Controller1.ButtonUp.pressing()){ //Press up button to select
@@ -123,7 +111,7 @@ void preAuton(){
       }
     }
   
-    if (Controller1.ButtonLeft.pressing() && !buttonLeftWasPressing){ //Press left button go left on auton list
+    if (pressed(Left)){ //Press left button go left on auton list
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
@@ -142,14 +130,9 @@ void preAuton(){
           currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
         }
       }
-      
-      buttonLeftWasPressing = true;
-    }
-    if (!Controller1.ButtonLeft.pressing() && buttonLeftWasPressing){
-      buttonLeftWasPressing = false;
     }
 
-    if (Controller1.ButtonRight.pressing() && !buttonRightWasPressing){ //Press right button go left on auton list
+    if (pressed(Right)){ //Press right button go left on auton list
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
@@ -168,11 +151,6 @@ void preAuton(){
           currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
         }
       }
-
-      buttonRightWasPressing = true;
-    }
-    if (!Controller1.ButtonRight.pressing() && buttonRightWasPressing){
-      buttonRightWasPressing = false; 
     }
 
     if (Controller1.ButtonUp.pressing()){ //Press up button to select
@@ -197,27 +175,35 @@ void autonomous(){
     }
     case AutonRedSolo: {
       runAutonRedSolo();
+      break;
     }
     case AutonRedLeft: {
       runAutonRedLeft();
+      break;
     }
     case AutonRedRight: {
       runAutonRedRight();
+      break;
     }
     case AutonRedRush: {
       runAutonRedRush();
+      break;
     }
     case AutonBlueSolo: {
       runAutonBlueSolo();
+      break;
     }
     case AutonBlueLeft: {
       runAutonBlueLeft();
+      break;
     }
     case AutonBlueRight: {
       runAutonBlueRight();
+      break;
     }
     case AutonBlueRush: {
       runAutonBlueRush();
+      break;
     }
     default: {
       break;
@@ -231,10 +217,9 @@ void autonomous(){
 
 void usercontrol(){
   while (true){
-    runTankDrive(100);
-    runIntake();
+    runArcadeDrive(100, 50);
+    runIntake(80);
     runMogo();
-    runRedirect();
     
     wait(20, msec);
   }
@@ -242,9 +227,9 @@ void usercontrol(){
 
 int main(){
   Competition.drivercontrol(usercontrol);
-  Competition.autonomous(autonomous);
+  // Competition.autonomous(autonomous);
 
-  preAuton();
+  // preAuton();
 
   while (true){
     wait(20, msec);

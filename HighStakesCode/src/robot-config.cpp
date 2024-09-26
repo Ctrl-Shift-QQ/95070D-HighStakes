@@ -13,19 +13,21 @@ brain  Brain;
 // VEXcode device constructors
 
 controller Controller1 = controller(primary);
-motor LeftFront = motor(PORT2, ratio6_1, true);
-motor LeftBack = motor(PORT20, ratio6_1, true);
-motor LeftStack = motor(PORT17, ratio6_1, true);
-motor RightFront = motor(PORT9, ratio6_1, false);
-motor RightBack = motor(PORT19, ratio6_1, false);
-motor RightStack = motor(PORT18, ratio6_1, false);
+motor LeftFront = motor(PORT3, ratio6_1, true);
+motor LeftBack = motor(PORT4, ratio6_1, true);
+motor LeftStack = motor(PORT5, ratio6_1, true);
+motor RightFront = motor(PORT1, ratio6_1, false);
+motor RightBack = motor(PORT2, ratio6_1, false);
+motor RightStack = motor(PORT11, ratio6_1, false);
 motor_group LeftDrive(LeftFront, LeftBack, LeftStack);
 motor_group RightDrive(RightFront, RightBack, RightStack);
-motor FirstIntake = motor(PORT1, ratio18_1, false);
-motor SecondIntake = motor(PORT5, ratio18_1, true);
+motor FirstIntake = motor(PORT9, ratio18_1, false);
+motor SecondIntake = motor(PORT7, ratio6_1, false);
 motor_group Intake(FirstIntake, SecondIntake);
 inertial Inertial = inertial(PORT12);
-digital_out MogoMech = digital_out(Brain.ThreeWirePort.A);
+encoder SidewaysTracker = encoder(Brain.ThreeWirePort.C);
+encoder ForwardTracker = encoder(Brain.ThreeWirePort.A);
+digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
 
 
 // VEXcode generated functions

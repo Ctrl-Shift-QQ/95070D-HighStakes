@@ -16,6 +16,8 @@ extern motor FirstIntake;
 extern motor SecondIntake;
 extern motor_group Intake;
 extern inertial Inertial;
+extern encoder SidewaysTracker;
+extern encoder ForwardTracker;
 extern digital_out MogoMech;
 
 

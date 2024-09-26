@@ -2,8 +2,8 @@
 
 class odom {
     private:
-        double sidewaysTrackerValue;
-        double forwardTrackerValue;
+        double previousSidewaysPosition;
+        double previousForwardPosition;
         double wheelSize;
         double sidewaysToCenterDistance;
         double forwardToCenterDistance;
