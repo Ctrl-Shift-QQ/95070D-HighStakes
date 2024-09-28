@@ -18,7 +18,7 @@ using namespace vex;
 competition Competition;
 
 
-typedef enum {
+typedef enum { //Enum for each of the autons
   AutonNone = 0,
   AutonRedSolo,
   AutonRedLeft,
@@ -28,7 +28,8 @@ typedef enum {
   AutonBlueLeft,
   AutonBlueRight,
   AutonBlueRush,
-} Auton; //Enum for each of the autons
+  AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
+} Auton;
 
 static Auton currentAuton = AutonNone;
 
@@ -101,10 +102,11 @@ void preAuton(){
       Controller1.Screen.setCursor(1, 5);
       Controller1.Screen.print("Auton Selected:");
 
-      if (static_cast<int> (currentAuton) > 4){ //Prints the corresponding text and the corresponding column
-        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - 1 - 4]);
-        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - 1 - 4].c_str());
+      if (!redAlliance){ //Prints the corresponding text and the corresponding column
+        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1]);
+        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1].c_str());
       }
+      //Offset by one to correspond to correct auton because AutonNone takes an extra spot
       else {
         Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - 1]); 
         Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - 1].c_str());
@@ -115,19 +117,19 @@ void preAuton(){
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
-        if (currentAuton == AutonNone || currentAuton == redAutons[0]){
+        if (currentAuton == AutonNone || currentAuton == redAutons[0]){ //Sets auton to last one if press left on first
           currentAuton = redAutons[sizeof(redAutons) - 1];
         }
         else {
-          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1); //Sets auton to the one before it
         }
       }
       else {
-        if (currentAuton == AutonNone || currentAuton == blueAutons[0]){
+        if (currentAuton == AutonNone || currentAuton == blueAutons[0]){ //Sets auton to last one if press left on first
           currentAuton = blueAutons[sizeof(redAutons) - 1];
         }
         else {
-          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1);
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1); //Sets auton to the one before it
         }
       }
     }
@@ -136,19 +138,19 @@ void preAuton(){
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
-        if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) - 1]){
+        if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) - 1]){ //Sets auton to first one if press right on last
           currentAuton = redAutons[0];
         }
         else {
-          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1); //Sets auton to the one after it
         }
       }
       else {
-        if (currentAuton == AutonNone || currentAuton == blueAutons[sizeof(redAutons) - 1]){
+        if (currentAuton == AutonNone || currentAuton == blueAutons[sizeof(redAutons) - 1]){ //Sets auton to first one if press right on last
           currentAuton = blueAutons[0];
         }
         else {
-          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1);
+          currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) + 1); //Sets auton to the one after it
         }
       }
     }
@@ -156,7 +158,7 @@ void preAuton(){
     if (Controller1.ButtonUp.pressing()){ //Press up button to select
       Controller1.Screen.clearScreen();
 
-      selectingAuton = false;
+      selectingAuton = false; //Exits loop
     }
     
     wait(20, msec);
@@ -169,7 +171,7 @@ void preAuton(){
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
 
-  switch (currentAuton){
+  switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
       break;
     }

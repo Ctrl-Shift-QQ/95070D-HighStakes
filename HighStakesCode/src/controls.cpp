@@ -101,12 +101,12 @@ bool pressed(ButtonID controlButtonID){ //Detects new presses
     }
 
     if (controlButton.pressing() && !buttonWasAlreadyPressed[static_cast<int> (controlButtonID)]){ //Button Pressed
-        buttonWasAlreadyPressed[static_cast<int> (controlButtonID)] = true; 
+        buttonWasAlreadyPressed[static_cast<int> (controlButtonID)] = true; //Sets corresponding value in array to true
 
         return true;
     }
     else if (!controlButton.pressing() && buttonWasAlreadyPressed[static_cast<int> (controlButtonID)]){ //Button Released
-        buttonWasAlreadyPressed[static_cast<int> (controlButtonID)] = false;
+        buttonWasAlreadyPressed[static_cast<int> (controlButtonID)] = false; //Sets corresponding value in array to false
     }
     
     return false;
