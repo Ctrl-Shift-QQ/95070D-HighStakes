@@ -24,8 +24,10 @@ motor_group RightDrive(RightFront, RightBack, RightStack);
 motor FirstIntake = motor(PORT9, ratio18_1, false);
 motor SecondIntake = motor(PORT7, ratio6_1, false);
 motor_group Intake(FirstIntake, SecondIntake);
-inertial Inertial = inertial(PORT12);
-encoder SidewaysTracker = encoder(Brain.ThreeWirePort.C);
+motor LadyBrown = motor(PORT10, ratio18_1, false);
+rotation LadyBrownRotation = rotation(PORT21, false);
+inertial Inertial = inertial(PORT13);
+encoder SidewaysTracker = encoder(Brain.ThreeWirePort.E);
 encoder ForwardTracker = encoder(Brain.ThreeWirePort.A);
 digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
 

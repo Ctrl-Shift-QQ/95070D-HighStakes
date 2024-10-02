@@ -17,7 +17,7 @@ typedef enum { //For pressed function
     L1,
     L2,
     R1,
-    R2,
+    R2, 
 } ButtonID;
 bool pressed(ButtonID controlButtonID);
 void motorToggle(directionType motorDirection, double motorVelocity, motor_group &controlMotor, ButtonID controlButtonID);
@@ -28,4 +28,5 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
 void runTankDrive(double percentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
 void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
 void runIntake(double percentSpeed);
+void runLadyBrown();
 void runMogo();

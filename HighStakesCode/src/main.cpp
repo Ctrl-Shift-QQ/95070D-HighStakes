@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "controls.h"
+#include "odom.h"
 #include "autons.h"
 #include <iostream>
 
@@ -228,7 +229,27 @@ void usercontrol(){
 }
 
 int main(){
-  Competition.drivercontrol(usercontrol);
+  Odom odom;
+  odom.setPhysicalMeasurements(2.75, 1.5, 4);
+  odom.setPosition(0, 0, 0);
+
+  Inertial.calibrate();
+  wait(3, sec);
+
+  while (true){
+    odom.updatePosition();
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 3);
+    Controller1.Screen.print("X: ");
+    Controller1.Screen.print(odom.xPosition);
+    Controller1.Screen.setCursor(2, 3);
+    Controller1.Screen.print("Y: ");
+    Controller1.Screen.print(odom.yPosition);
+    Controller1.Screen.setCursor(3, 3);
+    Controller1.Screen.print("θ: ");
+    Controller1.Screen.print(odom.orientation);
+  }
+  // Competition.drivercontrol(usercontrol);
   // Competition.autonomous(autonomous);
 
   // preAuton();

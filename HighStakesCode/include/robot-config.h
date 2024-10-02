@@ -15,6 +15,8 @@ extern motor_group RightDrive;
 extern motor FirstIntake;
 extern motor SecondIntake;
 extern motor_group Intake;
+extern motor LadyBrown;
+extern rotation LadyBrownRotation;
 extern inertial Inertial;
 extern encoder SidewaysTracker;
 extern encoder ForwardTracker;

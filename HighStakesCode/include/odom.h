@@ -1,10 +1,10 @@
 #include "vex.h"
 
-class odom {
+class Odom {
     private:
-        double previousSidewaysPosition; //Keeps track of 
+        double previousSidewaysPosition;
         double previousForwardPosition;
-        double previousOrientation;
+        double previousOrientationRad;
         double wheelSize;
         double sidewaysToCenterDistance;
         double forwardToCenterDistance;

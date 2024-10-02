@@ -185,6 +185,11 @@ void runIntake(double percentSpeed){
     motorSeperateButton(percentSpeed, Intake, Controller1.ButtonR1, Controller1.ButtonR2, Controller1.ButtonB);
 }
 
+void runLadyBrown(){
+    
+}
+
 void runMogo(){
     pistonToggle(MogoMech, A);
 }
+

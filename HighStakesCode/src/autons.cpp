@@ -33,3 +33,7 @@ void runAutonBlueRight(){
 void runAutonBlueRush(){
     
 }
+
+void runOdomTest(){
+
+}
