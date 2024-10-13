@@ -1,5 +1,5 @@
 #include "vex.h"
-#include <controls.h>
+#include "controls.h"
 #include <iostream>
 
 void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
@@ -24,9 +24,12 @@ void pistonSeperateButton(digital_out &controlPiston, const controller::button &
     }
 }
 
-void motorHold(directionType motorDirection, double motorVelocity, motor_group &controlMotor, const controller::button &controlButton){ //Hold button to spin
-    if (controlButton.pressing()){
-        controlMotor.spin(motorDirection, motorVelocity, percent);
+void motorHold(double motorVelocity, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton){ //Hold button to spin
+    if (forwardButton.pressing()){
+        controlMotor.spin(forward, motorVelocity, percent);
+    }
+    else if (reverseButton.pressing()){
+        controlMotor.spin(reverse, motorVelocity, percent);
     }
     else {
         controlMotor.stop();
@@ -185,11 +188,28 @@ void runIntake(double percentSpeed){
     motorSeperateButton(percentSpeed, Intake, Controller1.ButtonR1, Controller1.ButtonR2, Controller1.ButtonB);
 }
 
-void runLadyBrown(){
-    
+void runArm(){
+    static bool controlState = false; //True = macro, False = manual
+    static bool loadingState = false; //True = loading, False = down
+
+    if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()){
+        controlState = false;
+
+        // motorHold()
+    }
+    else {
+        controlState = true;
+    }
+    if (pressed(R1)){
+        loadingState = !loadingState;
+    }
 }
 
 void runMogo(){
     pistonToggle(MogoMech, A);
+}
+
+void runDoinker(){
+    pistonToggle(Doinker, X);
 }
 

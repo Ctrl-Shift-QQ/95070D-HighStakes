@@ -1,18 +1,21 @@
-#include "vex.h"
+#include "util.h"
 
-class Odom {
+class Odometry {
+    //In inches and degrees unless otherwise specified
     private:
         double previousSidewaysPosition;
         double previousForwardPosition;
         double previousOrientationRad;
-        double wheelSize;
+        double wheelDiameter;
         double sidewaysToCenterDistance;
         double forwardToCenterDistance;
     public:
-        double xPosition; //Inches
-        double yPosition; //Inches
-        double orientation; //Degrees
-        void setPhysicalMeasurements(double wheelSize, double sidewaysToCenterDistance, double forwardToCenterDistance);
+        Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance); //Constructor
+
+        double xPosition;
+        double yPosition;
+        double orientation;
+        
         void setPosition(double xPosition, double yPosition, double orientation);
         void updatePosition();
 };

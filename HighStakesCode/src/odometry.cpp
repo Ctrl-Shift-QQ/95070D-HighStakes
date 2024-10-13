@@ -1,14 +1,15 @@
 #include "vex.h"
-#include "odom.h"
+#include "odometry.h"
 #include <iostream>
 
-void Odom::setPhysicalMeasurements(double wheelSize, double sidewaysToCenterDistance, double forwardToCenterDistance){
-    this->wheelSize = wheelSize;
-    this->sidewaysToCenterDistance = sidewaysToCenterDistance;
-    this->forwardToCenterDistance = forwardToCenterDistance;
-}
+Odometry::Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance) :
+    wheelDiameter(wheelDiameter),
+    sidewaysToCenterDistance(sidewaysToCenterDistance),
+    forwardToCenterDistance(forwardToCenterDistance)
+{};
 
-void Odom::setPosition(double xPosition, double yPosition, double orientation){
+void Odometry::setPosition(double xPosition, double yPosition, double orientation){
+    //Sets variables accordingly
     this->xPosition = xPosition;
     this->yPosition = yPosition;
     this->orientation = orientation;
@@ -16,18 +17,19 @@ void Odom::setPosition(double xPosition, double yPosition, double orientation){
     this->previousForwardPosition = 0;
     this->previousOrientationRad = orientation * M_PI / 180;
 
+    //Sets sensor values accordingly
     Inertial.setHeading(orientation, degrees);
     SidewaysTracker.resetRotation();
     ForwardTracker.resetRotation();
 }
 
-void Odom::updatePosition(){
+void Odometry::updatePosition(){
     //Saves values so that they don't change during the same cycle
     double sidewaysTrackerPosition = SidewaysTracker.position(turns);
     double forwardTrackerPosition = ForwardTracker.position(turns);
-    double orientationRad = Inertial.heading(degrees) * M_PI / 180;
-    double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * wheelSize * M_PI; //Gets change in inches
-    double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * wheelSize * M_PI; //Gets change in inches
+    double orientationRad = degToRad(Inertial.heading(degrees));
+    double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * wheelDiameter * M_PI; //Gets change in inches
+    double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * wheelDiameter * M_PI; //Gets change in inches
     double orientationDeltaRad = orientationRad - previousOrientationRad;
     
     double localXPosition;
@@ -55,7 +57,7 @@ void Odom::updatePosition(){
     //Adds change to total value to get actual values
     this->xPosition += xPositionDelta;
     this->yPosition += yPositionDelta;
-    this->orientation = orientationRad * 180 / M_PI;
+    this->orientation = radToDeg(orientationRad);
 
     //Sets previous values of next cycle to current values
     this->previousSidewaysPosition = sidewaysTrackerPosition;

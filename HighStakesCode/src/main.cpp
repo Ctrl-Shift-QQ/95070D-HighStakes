@@ -7,9 +7,8 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
-#include "controls.h"
-#include "odom.h"
 #include "autons.h"
+#include "controls.h"
 #include <iostream>
 
 using namespace vex;
@@ -18,6 +17,7 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+Drivetrain chassis(2.75, -2.5, 0); //Initializes chassis
 
 typedef enum { //Enum for each of the autons
   AutonNone = 0,
@@ -32,7 +32,7 @@ typedef enum { //Enum for each of the autons
   AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
 } Auton;
 
-static Auton currentAuton = AutonNone;
+static Auton currentAuton = AutonNone; //Initializes currentAuton 
 
 void preAuton(){
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -48,7 +48,7 @@ void preAuton(){
 
   //Auton Selector
   bool selectingSide = true;
-  bool redAlliance; //True = Red, False = Blue
+  bool redAlliance; //True = red, False = blue
   bool selectingAuton = true;
 
   while (selectingSide){ //Selects the alliance color
@@ -221,38 +221,22 @@ void autonomous(){
 void usercontrol(){
   while (true){
     runArcadeDrive(100, 50);
-    runIntake(80);
+
+    runIntake(85);
+
     runMogo();
+
+    runDoinker();
     
     wait(20, msec);
   }
 }
 
 int main(){
-  Odom odom;
-  odom.setPhysicalMeasurements(2.75, 1.5, 4);
-  odom.setPosition(0, 0, 0);
+  Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
 
-  Inertial.calibrate();
-  wait(3, sec);
-
-  while (true){
-    odom.updatePosition();
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1, 3);
-    Controller1.Screen.print("X: ");
-    Controller1.Screen.print(odom.xPosition);
-    Controller1.Screen.setCursor(2, 3);
-    Controller1.Screen.print("Y: ");
-    Controller1.Screen.print(odom.yPosition);
-    Controller1.Screen.setCursor(3, 3);
-    Controller1.Screen.print("θ: ");
-    Controller1.Screen.print(odom.orientation);
-  }
-  // Competition.drivercontrol(usercontrol);
-  // Competition.autonomous(autonomous);
-
-  // preAuton();
+  preAuton();
 
   while (true){
     wait(20, msec);

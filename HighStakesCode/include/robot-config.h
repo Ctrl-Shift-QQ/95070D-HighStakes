@@ -15,12 +15,14 @@ extern motor_group RightDrive;
 extern motor FirstIntake;
 extern motor SecondIntake;
 extern motor_group Intake;
-extern motor LadyBrown;
-extern rotation LadyBrownRotation;
+extern motor Arm;
+extern rotation ArmRotation;
+extern optical IntakeOptical;
 extern inertial Inertial;
 extern encoder SidewaysTracker;
 extern encoder ForwardTracker;
 extern digital_out MogoMech;
+extern digital_out Doinker;
 
 
 /**
