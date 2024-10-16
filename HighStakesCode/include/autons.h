@@ -2,22 +2,24 @@
 
 void setDefaultPIDConstants();
 
-void driveToPointTest();
+extern redAlliance;
+
+int colorSort();
 
 void runOdomTest();
 
-void runAutonRedSolo();
+void runAutonRedSoloAWP();
 
-void runAutonRedLeft();
+void runAutonRedRushAWP();
 
-void runAutonRedRight();
+void runAutonRedStackAWP();
 
-void runAutonRedRush();
+void runAutonRedGoalRush();
 
-void runAutonBlueSolo();
+void runAutonBlueSoloAWP();
 
-void runAutonBlueLeft();
+void runAutonBlueRushAWP();
 
-void runAutonBlueRight();
+void runAutonBlueStackAWP();
 
-void runAutonBlueRush();
+void runAutonBlueGoalRush();

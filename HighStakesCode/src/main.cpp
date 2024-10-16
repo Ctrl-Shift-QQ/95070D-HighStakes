@@ -21,14 +21,14 @@ Drivetrain chassis(2.75, -2.5, 0); //Initializes chassis
 
 typedef enum { //Enum for each of the autons
   AutonNone = 0,
-  AutonRedSolo,
-  AutonRedLeft,
-  AutonRedRight,
-  AutonRedRush,
-  AutonBlueSolo,
-  AutonBlueLeft,
-  AutonBlueRight,
-  AutonBlueRush,
+  AutonRedSoloAWP,
+  AutonRedRushAWP,
+  AutonRedStackAWP,
+  AutonRedGoalRush,
+  AutonBlueSoloAWP,
+  AutonBlueRushAWP,
+  AutonBlueStackAWP,
+  AutonBlueGoalRush,
   AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
 } Auton;
 
@@ -38,13 +38,16 @@ void preAuton(){
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  //Inertial Calibration
+  //Sensor reset and calibration
+  ArmRotation.resetPosition();
+
   Controller1.Screen.clearScreen();
   Controller1.Screen.setCursor(2, 6);
   Inertial.calibrate();
   Controller1.Screen.print("CALIBRATING!!!");
   wait(3, sec);
   Controller1.Screen.clearScreen();
+
 
   //Auton Selector
   bool selectingSide = true;
@@ -83,16 +86,16 @@ void preAuton(){
       selectingSide = false;
     }
 
-    wait(20, msec);
+    wait(30, msec);
   }
 
   wait(50, msec);
   Controller1.rumble("..");
 
   int columns[] = {8, 5, 5, 8}; //Columns to center the text
-  std::string autonNames[] = {"Solo AWP", "Left-Side AWP", "Right-Side AWP", "Goal Rush"};
-  Auton redAutons[] = {AutonRedSolo, AutonRedLeft, AutonRedRight, AutonRedRush};
-  Auton blueAutons[] = {AutonBlueSolo, AutonBlueLeft, AutonBlueRight, AutonBlueRush};
+  std::string autonNames[] = {"Solo AWP", "Rush-Side AWP", "Stack-Side AWP", "Goal Rush"};
+  Auton redAutons[] = {AutonRedSoloAWP, AutonRedRushAWP, AutonRedStackAWP, AutonRedGoalRush};
+  Auton blueAutons[] = {AutonBlueSoloAWP, AutonBlueRushAWP, AutonBlueStackAWP, AutonBlueGoalRush};
 
   while (selectingAuton){ //Selects the auton
     if (currentAuton == AutonNone){
@@ -162,7 +165,7 @@ void preAuton(){
       selectingAuton = false; //Exits loop
     }
     
-    wait(20, msec);
+    wait(30, msec);
   }
 
   wait(50, msec);
@@ -176,36 +179,36 @@ void autonomous(){
     case AutonNone: {
       break;
     }
-    case AutonRedSolo: {
-      runAutonRedSolo();
+    case AutonRedSoloAWP: {
+      runAutonRedSoloAWP();
       break;
     }
-    case AutonRedLeft: {
-      runAutonRedLeft();
+    case AutonRedRushAWP: {
+      runAutonRedRushAWP();
       break;
     }
-    case AutonRedRight: {
-      runAutonRedRight();
+    case AutonRedStackAWP: {
+      runAutonRedStackAWP();
       break;
     }
-    case AutonRedRush: {
-      runAutonRedRush();
+    case AutonRedGoalRush: {
+      runAutonRedGoalRush();
       break;
     }
-    case AutonBlueSolo: {
-      runAutonBlueSolo();
+    case AutonBlueSoloAWP: {
+      runAutonBlueSoloAWP();
       break;
     }
-    case AutonBlueLeft: {
-      runAutonBlueLeft();
+    case AutonBlueRushAWP: {
+      runAutonBlueRushAWP();
       break;
     }
-    case AutonBlueRight: {
-      runAutonBlueRight();
+    case AutonBlueStackAWP: {
+      runAutonBlueStackAWP();
       break;
     }
-    case AutonBlueRush: {
-      runAutonBlueRush();
+    case AutonBlueGoalRush: {
+      runAutonBlueGoalRush();
       break;
     }
     default: {
@@ -218,27 +221,30 @@ void autonomous(){
   Controller1.Screen.print(" Seconds");
 }
 
-void usercontrol(){
-  while (true){
-    runArcadeDrive(100, 50);
+// void usercontrol(){
+//   while (true){
+//     runArcadeDrive(100, 60);
 
-    runIntake(85);
+//     runIntake(85);
 
-    runMogo();
+//     runMogo();
 
-    runDoinker();
+//     runDoinker();
+
+//     runArm(25, 5, 95, 0.5, 5);
     
-    wait(20, msec);
-  }
-}
+//     wait(20, msec);
+//   }
+// }
 
 int main(){
-  Competition.drivercontrol(usercontrol);
-  Competition.autonomous(autonomous);
+  runAutonRedSoloAWP();
+  // Competition.drivercontrol(usercontrol);
+  // Competition.autonomous(autonomous);
 
-  preAuton();
+  // preAuton();
 
-  while (true){
-    wait(20, msec);
-  }
+  // while (true){
+  //   wait(20, msec);
+  // }
 }

@@ -26,6 +26,6 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
 void runTankDrive(double percentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
 void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
 void runIntake(double percentSpeed);
-void runArm();
+void runArm(double loadingPosition, double deadband, double manualSpeed, double macroKp, double intakeSpeed);
 void runMogo();
 void runDoinker();

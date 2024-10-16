@@ -1,26 +1,26 @@
+
 class PID {
-    private:
-        double startError;
+    public:
+        const double startError;
 
         //Tunings
-        double kp;
-        double ki;
-        double kd;
+        const double kp;
+        const double ki;
+        const double kd;
 
+        //For settling calculations
+        const double deadband;
+        const double loopCycleTime;
+        double timeSpent;
+        const double settleTime;
+        const double timeout;
+        
         //For output calculations
-        double startI;
+        const double startI;
         double integral;
         double previousError;
         double derivative;
 
-        //For settling calculations
-        double deadband;
-        double loopCycleTime;
-        double timeSpent;
-        double settleTime;
-        double timeout;
-
-    public:
         PID(double startError, double kp, double ki, double kd, double startI, double deadband, double loopCycleTime, double settleTime, double timeout); //Constructor
 
         double output(double error); //Returns the output of the PID loop

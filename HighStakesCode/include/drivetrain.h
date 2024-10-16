@@ -1,5 +1,6 @@
 #include "odometry.h"
 #include "PID.h"
+#include <iostream>
 
 class Drivetrain {
     private:
@@ -26,9 +27,11 @@ class Drivetrain {
             double kd;
             double startI;
             double minimumSpeed;
+            double maximumSpeed;
         } outputConstants;
 
         outputConstants defaultDriveOutputConstants;
+        outputConstants defaultDriveDistanceTurnOutputConstants;
         outputConstants defaultTurnOutputConstants;
         outputConstants defaultSwingOutputConstants;
 
@@ -40,6 +43,7 @@ class Drivetrain {
         } settleConstants;
         
         settleConstants defaultDriveSettleConstants;
+        settleConstants defaultDriveDistanceTurnSettleConstants;
         settleConstants defaultTurnSettleConstants;
         settleConstants defaultSwingSettleConstants;
 
@@ -47,26 +51,27 @@ class Drivetrain {
         /******************** Motion algorithms ********************/
 
         void driveToPoint(double targetX, double targetY);
-        void driveToPoint(double targetX, double targetY, outputConstants driveOutputConstants, settleConstants settleConstants);
-        void driveToPoint(double targetX, double targetY, outputConstants driveOutputConstants, outputConstants turnOutputConstants, settleConstants settleConstants);
+        void driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants);
+        void driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants, outputConstants turnOutputConstants);
 
         void driveDistance(double targetDistance);
-        void driveDistance(double targetDistance, outputConstants driveOutputConstants, settleConstants driveSettleConstants);
-        void driveDistance(double targetDistance, outputConstants driveOutputConstants, outputConstants turnOutputConstants, settleConstants driveSettleConstants);
+        void driveDistance(double targetDistance, double targetHeading);
+        void driveDistance(double targetDistance, double targetHeading, settleConstants driveSettleConstants);
+        void driveDistance(double targetDistance, double targetHeading, settleConstants driveSettleConstants, outputConstants driveOutputConstants);
 
         void turnToHeading(double targetHeading);
-        void turnToHeading(double targetHeading, outputConstants turnOutputConstants);
-        void turnToHeading(double targetHeading, outputConstants turnOutputConstants, settleConstants turnSettleConstants);
+        void turnToHeading(double targetHeading, settleConstants turnSettleConstants);
+        void turnToHeading(double targetHeading, settleConstants turnSettleConstants, outputConstants turnOutputConstants);
 
-        void turnToPoint(double targetX, double targetY);
-        void turnToPoint(double targetX, double targetY, outputConstants turnOutputConstants);
-        void turnToPoint(double targetX, double targetY, outputConstants turnOutputConstants, settleConstants turnSettleConstants);
+        void turnToPoint(bool reversed, double targetX, double targetY);
+        void turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants);
+        void turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants, outputConstants turnOutputConstants);
 
-        // void swingToHeading(std::string direction, double target);
-        // void swingToHeading(std::string direction, double target, double kp, double ki, double kd, double startI, double minimumSpeed);
-        // void swingToHeading(std::string direction, double target, double kp, double ki, double kd, double startI, double minimumSpeed, double deadband, double loopCycleTime, double settleTime, double timeout);
+        void swingToHeading(std::string side, double target);
+        void swingToHeading(std::string side, double target, outputConstants swingOutputConstants);
+        void swingToHeading(std::string side, double target, double kp, double ki, double kd, double startI, double minimumSpeed, double deadband, double loopCycleTime, double settleTime, double timeout);
 
-        void stopDrive(vex::brakeType brakeType);
+        void stopDrive(brakeType brakeType);
 };
 
 extern Drivetrain chassis;

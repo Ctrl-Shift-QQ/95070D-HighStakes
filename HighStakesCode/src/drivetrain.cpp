@@ -26,27 +26,31 @@ void Drivetrain::setCoordinates(double startPositionX, double startPositionY, do
 /******************** Motion Algorithms ********************/
 
 void Drivetrain::driveToPoint(double targetX, double targetY){
-    driveToPoint(targetX, targetY, defaultDriveOutputConstants, defaultTurnOutputConstants, defaultDriveSettleConstants); 
+    driveToPoint(targetX, targetY, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultTurnOutputConstants); 
 }
 
-void Drivetrain::driveToPoint(double targetX, double targetY, outputConstants driveOutputConstants, settleConstants driveSettleConstants){
-    driveToPoint(targetX, targetY, driveOutputConstants, defaultTurnOutputConstants, driveSettleConstants);
+void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
+    driveToPoint(targetX, targetY, driveSettleConstants, driveOutputConstants, defaultTurnOutputConstants);
 }
 
-void Drivetrain::driveToPoint(double targetX, double targetY, outputConstants driveOutputConstants, outputConstants turnOutputConstants, settleConstants driveSettleConstants){
+void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants, outputConstants turnOutputConstants){
     double driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
     double turnTarget = radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)); //Heading that faces target
-    double turnError;
+    double turnError = 0;
     if (cos(degToRad(headingError(turnTarget, odom.orientation))) < 0){ //Reverses target heading if driving backwards
         turnError = headingError(fmod(turnTarget + 180, 360), odom.orientation);
     }
     else {
         turnError = headingError(turnTarget, odom.orientation);
     }
+    double driveOutput = 0;
+    double turnOutput = 0;
+    double leftDriveOutput = 0;
+    double rightDriveOutput = 0;
     
     //Double PID (drives and turns toward the target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
+    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, driveSettleConstants.deadband, 0, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
         driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
@@ -58,13 +62,19 @@ void Drivetrain::driveToPoint(double targetX, double targetY, outputConstants dr
             turnError = headingError(turnTarget, odom.orientation);
         }
 
-        double leftDriveOutput = drivePID.output(driveError) * cos(degToRad(headingError(turnTarget, odom.orientation))) + turnPID.output(turnError);
-        double rightDriveOutput = drivePID.output(driveError) * cos(degToRad(headingError(turnTarget, odom.orientation))) - turnPID.output(turnError);
+        driveOutput = drivePID.output(driveError) * cos(degToRad(headingError(turnTarget, odom.orientation)));
+        turnOutput = turnPID.output(turnError);
+        if (fabs(driveError) < turnPID.deadband){ //Prevents drastic turning when near the target
+            turnOutput = 0;
+        }
 
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
-        leftDriveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, leftDriveOutput, rightDriveOutput);
-        rightDriveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, leftDriveOutput, rightDriveOutput);
-        
+        driveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, driveOutputConstants.maximumSpeed, driveOutput, driveOutput);
+        turnOutput *= driveOutputScale(turnOutputConstants.minimumSpeed, turnOutputConstants.maximumSpeed, turnOutput, turnOutput);
+
+        leftDriveOutput = driveOutput + turnOutput;
+        rightDriveOutput = driveOutput - turnOutput;
+
         LeftDrive.spin(forward, leftDriveOutput, percent);
         RightDrive.spin(forward, rightDriveOutput, percent);
 
@@ -74,72 +84,111 @@ void Drivetrain::driveToPoint(double targetX, double targetY, outputConstants dr
 
 
 void Drivetrain::driveDistance(double targetDistance){
-    driveDistance(targetDistance, defaultDriveOutputConstants, defaultTurnOutputConstants, defaultDriveSettleConstants);
+    driveDistance(targetDistance, odom.orientation, defaultDriveSettleConstants, defaultDriveOutputConstants);
 }
 
-void Drivetrain::driveDistance(double targetDistance, outputConstants driveOutputConstants, settleConstants driveSettleConstants){
-    driveDistance(targetDistance, driveOutputConstants, defaultTurnOutputConstants, driveSettleConstants);
+void Drivetrain::driveDistance(double targetDistance, double targetHeading){
+    driveDistance(targetDistance, targetHeading, defaultDriveSettleConstants, defaultDriveOutputConstants);
 }
 
-void Drivetrain::driveDistance(double targetDistance, outputConstants driveOutputConstants, outputConstants turnOutputConstants, settleConstants driveSettleConstants){
-    double targetX = odom.xPosition + targetDistance * cos(degToRad(headingToPolar(odom.orientation)));
-    double targetY = odom.yPosition + targetDistance * sin(degToRad(headingToPolar(odom.orientation)));
+void Drivetrain::driveDistance(double targetDistance, double targetHeading, settleConstants driveSettleConstants){
+    driveDistance(targetDistance, targetHeading, driveSettleConstants, defaultDriveOutputConstants);
+}
 
-    driveToPoint(targetX, targetY, driveOutputConstants, turnOutputConstants, driveSettleConstants);
+void Drivetrain::driveDistance(double targetDistance, double targetHeading, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
+    double startX = odom.xPosition;
+    double startY = odom.yPosition;
+    double polarHeadingRad = degToRad(90 - fmod(headingToPolar(targetHeading), 360));
+    double distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled
+    double driveError = targetDistance - distanceTraveled;
+    double turnError = headingError(targetHeading, odom.orientation);
+    double driveOutput = 0;
+    double turnOutput = 0;
+    double leftDriveOutput = 0;
+    double rightDriveOutput = 0;
+
+    //Double PID (drives and aligns towards target simultaneously)
+    PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
+    PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, 0, 0, 0, 0);
+
+    while (!drivePID.isSettled(driveError)){
+        distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled
+        driveError = targetDistance - distanceTraveled;
+        turnError = headingError(targetHeading, odom.orientation);
+
+        driveOutput = drivePID.output(driveError);
+        turnOutput = turnPID.output(turnError);
+
+        //Clamps the output speeds to stay within the specified minimum and maximum speeds
+        driveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, driveOutputConstants.maximumSpeed, driveOutput, driveOutput);
+        turnOutput *= driveOutputScale(defaultDriveDistanceTurnOutputConstants.minimumSpeed, defaultDriveDistanceTurnOutputConstants.maximumSpeed, turnOutput, turnOutput);
+        
+        leftDriveOutput = driveOutput + turnError;
+        rightDriveOutput = driveOutput - turnError;
+
+        LeftDrive.spin(forward, leftDriveOutput, percent);
+        RightDrive.spin(forward, rightDriveOutput, percent);
+
+        wait(driveSettleConstants.loopCycleTime, msec);
+    }
 }
 
 
 void Drivetrain::turnToHeading(double targetHeading){
-    turnToHeading(targetHeading, defaultTurnOutputConstants, defaultTurnSettleConstants);
+    turnToHeading(targetHeading, defaultTurnSettleConstants, defaultTurnOutputConstants);
 }
 
-void Drivetrain::turnToHeading(double targetHeading, outputConstants turnOutputConstants){
-    turnToHeading(targetHeading, turnOutputConstants, defaultTurnSettleConstants);
+void Drivetrain::turnToHeading(double targetHeading, settleConstants turnSettleConstants){
+    turnToHeading(targetHeading, turnSettleConstants, defaultTurnOutputConstants);
 }
 
-void Drivetrain::turnToHeading(double targetHeading, outputConstants turnOutputConstants, settleConstants turnSettleConstants){
+void Drivetrain::turnToHeading(double targetHeading, settleConstants turnSettleConstants, outputConstants turnOutputConstants){
     double turnError = headingError(targetHeading, odom.orientation);
+    double turnOutput = 0;
 
     PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, turnSettleConstants.deadband, turnSettleConstants.loopCycleTime, turnSettleConstants.settleTime, turnSettleConstants.timeout);
 
     while (!turnPID.isSettled(turnError)){
         turnError = headingError(targetHeading, odom.orientation);
 
-        double driveOutput = turnPID.output(turnError);
+        turnOutput = turnPID.output(turnError);
 
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
-        driveOutput *= driveOutputScale(turnOutputConstants.minimumSpeed, driveOutput, -driveOutput);
+        turnOutput *= driveOutputScale(turnOutputConstants.minimumSpeed, turnOutputConstants.maximumSpeed, turnOutput, -turnOutput);
 
-        LeftDrive.spin(forward, driveOutput, percent);
-        RightDrive.spin(reverse, driveOutput, percent);
+        LeftDrive.spin(forward, turnOutput, percent);
+        RightDrive.spin(reverse, turnOutput, percent);
 
         wait(turnSettleConstants.loopCycleTime, msec);
     }
 }
 
 
-void Drivetrain::turnToPoint(double targetX, double targetY){
-    turnToPoint(targetX, targetY, defaultTurnOutputConstants, defaultTurnSettleConstants);
+void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY){
+    turnToPoint(reversed, targetX, targetY, defaultTurnSettleConstants, defaultTurnOutputConstants);
 }
 
-void Drivetrain::turnToPoint(double targetX, double targetY, outputConstants turnOutputConstants){
-    turnToPoint(targetX, targetY, turnOutputConstants, defaultTurnSettleConstants);
+void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants){
+    turnToPoint(reversed, targetX, targetY, turnSettleConstants, defaultTurnOutputConstants);
 }
 
-void Drivetrain::turnToPoint(double targetX, double targetY, outputConstants turnOutputConstants, settleConstants turnSettleConstants){
-    double targetHeading = radToDeg(atan2(targetX, targetY));
+void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants, outputConstants turnOutputConstants){
+    double targetHeading = 0;
+    if (reversed){
+        targetHeading = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 180, 360);
+    }
+    else {
+        targetHeading = radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition));
+    }
 
-    turnToHeading(targetHeading, turnOutputConstants, turnSettleConstants);
+    turnToHeading(targetHeading, turnSettleConstants, turnOutputConstants);
 }
 
 
-void Drivetrain::stopDrive(vex::brakeType brakeType){
+void Drivetrain::stopDrive(brakeType brakeType){
     LeftDrive.stop(brakeType);
     RightDrive.stop(brakeType);
 }
-
-
-
 
 
 

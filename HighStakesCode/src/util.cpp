@@ -17,7 +17,7 @@ double radToDeg(double rad){
 double headingToPolar(double heading){
     double output = 360 - (heading - 90);
 
-    if (output > 360){ //Brings output to 0 - 360
+    if (output >= 360){ //Brings output to 0 - 360
         output -= 360;
     }
     else if (output < 0){
@@ -30,7 +30,7 @@ double headingToPolar(double heading){
 double polarToHeading(double polar){
     double output = 360 - (polar - 90);
 
-    if (output > 360){ //Brings output to 0 - 360
+    if (output >= 360){ //Brings output to 0 - 360
         output -= 360;
     }
     else if (output < 0){
@@ -56,7 +56,7 @@ double headingError(double target, double heading){
     return output;
 }
 
-double driveOutputScale(double minimumSpeed, double leftDriveOutput, double rightDriveOutput){
+double driveOutputScale(double minimumSpeed, double maximumSpeed, double leftDriveOutput, double rightDriveOutput){
     if (fabs(leftDriveOutput) < minimumSpeed || fabs(rightDriveOutput) < minimumSpeed){ //Sets speeds to minimumSpeed if calculated output is less
         if (fabs(leftDriveOutput) < fabs(rightDriveOutput)){
             return minimumSpeed / fabs(leftDriveOutput);
@@ -64,12 +64,12 @@ double driveOutputScale(double minimumSpeed, double leftDriveOutput, double righ
 
         return minimumSpeed / fabs(rightDriveOutput);
     }
-    else if (fabs(leftDriveOutput) > 100 || fabs(rightDriveOutput) > 100){ //Sets speeds to 100 if calculated output is more
-        if (fabs(leftDriveOutput) > fabs(rightDriveOutput)){
-            return 100 / fabs(leftDriveOutput);
+    else if (fabs(leftDriveOutput) > maximumSpeed || fabs(rightDriveOutput) > maximumSpeed){ //Sets speeds to maximumSpeed if calculated output is more
+       if (fabs(leftDriveOutput) > fabs(rightDriveOutput)){
+            return maximumSpeed / fabs(leftDriveOutput);
         }
     
-        return 100 / fabs(rightDriveOutput);
+        return maximumSpeed / fabs(rightDriveOutput);
     }
     
     return 1;

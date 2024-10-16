@@ -11,7 +11,7 @@ void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const 
         controlMotor.spin(reverse, motorVelocity, percent);
     }
     else if (stopButton.pressing()){
-        controlMotor.stop();
+        controlMotor.stop(brake);
     }
 }
 
@@ -32,7 +32,7 @@ void motorHold(double motorVelocity, motor_group &controlMotor, const controller
         controlMotor.spin(reverse, motorVelocity, percent);
     }
     else {
-        controlMotor.stop();
+        controlMotor.stop(brake);
     }
 }
 
@@ -126,7 +126,7 @@ void motorToggle(directionType motorDirection, double motorVelocity, motor_group
             controlMotor.spin(motorDirection);
         }
         else {
-            controlMotor.stop();
+            controlMotor.stop(brake);
         }
     }
 }
@@ -188,20 +188,32 @@ void runIntake(double percentSpeed){
     motorSeperateButton(percentSpeed, Intake, Controller1.ButtonR1, Controller1.ButtonR2, Controller1.ButtonB);
 }
 
-void runArm(){
-    static bool controlState = false; //True = macro, False = manual
+void runArm(double loadingPosition, double deadband, double manualSpeed, double macroKp, double intakeSpeed){
     static bool loadingState = false; //True = loading, False = down
+    static double targetPosition = 0;
 
-    if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()){
-        controlState = false;
+    if (Controller1.ButtonL1.pressing()){ //Manual
+        motorHold(manualSpeed, Arm, Controller1.ButtonL1, Controller1.ButtonL2);
+        motorHold(intakeSpeed, Intake, Controller1.ButtonL2, Controller1.ButtonL1);
+    }
+    else { //Macro
+        if (pressed(Up)){
+            loadingState = !loadingState;
+        }
+        
+        if (loadingState){
+            targetPosition = loadingPosition;
+        }
+        else {
+            targetPosition = 0;
+        }
 
-        // motorHold()
-    }
-    else {
-        controlState = true;
-    }
-    if (pressed(R1)){
-        loadingState = !loadingState;
+        if (fabs(targetPosition - ArmRotation.position(degrees)) > deadband){
+            Arm.spin(forward, targetPosition - ArmRotation.position(degrees), percent);
+        }
+        else {
+            Arm.stop(brake);
+        }
     }
 }
 
