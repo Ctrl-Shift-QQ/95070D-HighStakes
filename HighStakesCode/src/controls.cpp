@@ -2,8 +2,12 @@
 #include "controls.h"
 #include <iostream>
 
+controller dummyController;
+controller::button nullButton = dummyController.ButtonA; //Placeholder for button when valid button not wanted
+
 void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton){ //Tap seperate buttons for spin forward, spin reverse, and stop
+
     if (spinForwardButton.pressing()){
         controlMotor.spin(forward, motorVelocity, percent);
     }
@@ -25,6 +29,7 @@ void pistonSeperateButton(digital_out &controlPiston, const controller::button &
 }
 
 void motorHold(double motorVelocity, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton){ //Hold button to spin
+
     if (forwardButton.pressing()){
         controlMotor.spin(forward, motorVelocity, percent);
     }
@@ -117,13 +122,12 @@ bool pressed(ButtonID controlButtonID){ //Detects new presses
 
 void motorToggle(directionType motorDirection, double motorVelocity, motor_group &controlMotor, ButtonID controlButtonID){ //Toggle button to spin/stop
     static bool motorState = false;
-    controlMotor.setVelocity(motorVelocity, percent);
 
     if (pressed(controlButtonID)){
         motorState = !motorState;
 
         if (motorState){
-            controlMotor.spin(motorDirection);
+            controlMotor.spin(motorDirection, motorVelocity, percent);
         }
         else {
             controlMotor.stop(brake);
@@ -142,42 +146,26 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID){ //Toggl
 
 /********** Controls **********/
 
-void runTankDrive(double percentSpeed, bool toggleSpeed, ButtonID toggleSpeedButtonID, 
-                  double slowPercentSpeed){ //Each joystick controls the movement of the corresponding side of the drivetrain
-    static bool slowMode;
+void runTankDrive(double percentSpeed, bool toggleSpeed, const controller::button &toggleSpeedButton, double slowPercentSpeed){ //Each joystick controls the movement of the corresponding side of the drivetrain
     double leftDriveSpeed = Controller1.Axis3.position(percent) * percentSpeed / 100;
     double rightDriveSpeed = Controller1.Axis2.position(percent) * percentSpeed / 100;
 
-    if (toggleSpeed){
-        if (pressed(toggleSpeedButtonID)){
-            slowMode = !slowMode;
-        }
-
-        if (slowMode){ //Makes drivetrain move slower when in slowmode
-            leftDriveSpeed *= slowPercentSpeed / 100;
-            rightDriveSpeed *= slowPercentSpeed / 100;
-        }
+    if (toggleSpeedButton.pressing()){ //Makes drivetrain move slower when in slowmode
+        leftDriveSpeed *= slowPercentSpeed / 100;
+        rightDriveSpeed *= slowPercentSpeed / 100;
     }
 
     LeftDrive.spin(forward, leftDriveSpeed, percent);
     RightDrive.spin(forward, rightDriveSpeed, percent);
 }
 
-void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed, ButtonID toggleSpeedButtonID, 
-                    double slowPercentSpeed){ //Left joystick up/down controls forward backward, right joystick left/right controls turning
-    static bool slowMode;
+void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed, const controller::button &toggleSpeedButton, double slowPercentSpeed){ //Left joystick up/down controls forward backward, right joystick left/right controls turning
     double leftDriveSpeed = (Controller1.Axis3.position(percent) + (Controller1.Axis1.position(percent) * steerPercentSpeed / 100)) * percentSpeed / 100;
     double rightDriveSpeed = (Controller1.Axis3.position(percent) - (Controller1.Axis1.position(percent) * steerPercentSpeed / 100)) * percentSpeed / 100;
 
-    if (toggleSpeed){
-        if (pressed(toggleSpeedButtonID)){
-            slowMode = !slowMode;
-        }
-
-        if (slowMode){ //Makes drivetrain move slower when in slowmode
-            leftDriveSpeed *= slowPercentSpeed / 100;
-            rightDriveSpeed *= slowPercentSpeed / 100;
-        }
+    if (toggleSpeedButton.pressing()){ //Makes drivetrain move slower when in slowmode
+        leftDriveSpeed *= slowPercentSpeed / 100;
+        rightDriveSpeed *= slowPercentSpeed / 100;
     }
 
     LeftDrive.spin(forward, leftDriveSpeed, percent);
@@ -188,13 +176,13 @@ void runIntake(double percentSpeed){
     motorSeperateButton(percentSpeed, Intake, Controller1.ButtonR1, Controller1.ButtonR2, Controller1.ButtonB);
 }
 
-void runArm(double loadingPosition, double deadband, double manualSpeed, double macroKp, double intakeSpeed){
+void runArm(double loadingPosition, double manualSpeed, double macroKp, double intakeSpeed){
     static bool loadingState = false; //True = loading, False = down
     static double targetPosition = 0;
 
     if (Controller1.ButtonL1.pressing()){ //Manual
-        motorHold(manualSpeed, Arm, Controller1.ButtonL1, Controller1.ButtonL2);
-        motorHold(intakeSpeed, Intake, Controller1.ButtonL2, Controller1.ButtonL1);
+        motorHold(manualSpeed, Arm, Controller1.ButtonL1, nullButton);
+        motorHold(intakeSpeed, Intake, nullButton, Controller1.ButtonL1);
     }
     else { //Macro
         if (pressed(Up)){
@@ -208,12 +196,7 @@ void runArm(double loadingPosition, double deadband, double manualSpeed, double 
             targetPosition = 0;
         }
 
-        if (fabs(targetPosition - ArmRotation.position(degrees)) > deadband){
-            Arm.spin(forward, targetPosition - ArmRotation.position(degrees), percent);
-        }
-        else {
-            Arm.stop(brake);
-        }
+        Arm.spin(forward, macroKp * (targetPosition - ArmRotation.position(degrees)), percent);
     }
 }
 

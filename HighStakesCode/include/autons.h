@@ -1,10 +1,20 @@
 #include "drivetrain.h"
 
+/******************** PID Tunings ********************/
+
 void setDefaultPIDConstants();
 
-extern redAlliance;
+/******************** Tasks ********************/
+
+extern bool redAlliance;
 
 int colorSort();
+
+int armDown();
+
+int armLoad();
+
+/******************** Autons ********************/
 
 void runOdomTest();
 
@@ -23,3 +33,7 @@ void runAutonBlueRushAWP();
 void runAutonBlueStackAWP();
 
 void runAutonBlueGoalRush();
+
+/******************** PID Tunings ********************/
+
+void runProgSkills();

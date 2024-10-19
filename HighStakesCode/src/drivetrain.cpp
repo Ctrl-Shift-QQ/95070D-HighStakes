@@ -10,7 +10,7 @@ Drivetrain::Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, do
 
 int Drivetrain::trackPosition(){
     while (true){
-       chassis.odom.updatePosition();
+        chassis.odom.updatePosition();
         
         wait(5, msec);
     }
@@ -115,7 +115,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, sett
         distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled
         driveError = targetDistance - distanceTraveled;
         turnError = headingError(targetHeading, odom.orientation);
-
+        
         driveOutput = drivePID.output(driveError);
         turnOutput = turnPID.output(turnError);
 

@@ -6,9 +6,8 @@ class Drivetrain {
     private:
         /******************** Position tracking ********************/
 
-        vex::task positionTrackTask;
         static int trackPosition();
-
+        task positionTrackTask;
 
     public:
         Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance); //Constructor

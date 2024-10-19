@@ -27,13 +27,14 @@ motor_group Intake(FirstIntake, SecondIntake);
 motor ArmMotor = motor(PORT10, ratio18_1, true);
 motor_group Arm(ArmMotor);
 rotation ArmRotation = rotation(PORT12, false);
-optical IntakeOptical = optical(PORT6);
+optical IntakeOptical = optical(PORT21);
 inertial Inertial = inertial(PORT8);
 encoder SidewaysTracker = encoder(Brain.ThreeWirePort.E);
 encoder ForwardTracker = encoder(Brain.ThreeWirePort.A);
 digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
 digital_out Doinker = digital_out(Brain.ThreeWirePort.D);
 
+//Bad Ports: 6, 19, 18, 17, 20
 
 
 // VEXcode generated functions

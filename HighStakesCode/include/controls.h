@@ -23,9 +23,9 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
 
 /********** Controls **********/
 
-void runTankDrive(double percentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
-void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
+void runTankDrive(double percentSpeed, bool toggleSpeed = false, const controller::button &toggleSpeedButton = Controller1.ButtonA, double slowPercentSpeed = 0);
+void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, const controller::button &toggleSpeedButton = Controller1.ButtonA, double slowPercentSpeed = 0);
 void runIntake(double percentSpeed);
-void runArm(double loadingPosition, double deadband, double manualSpeed, double macroKp, double intakeSpeed);
+void runArm(double loadingPosition, double manualSpeed, double macroKp, double intakeSpeed);
 void runMogo();
 void runDoinker();

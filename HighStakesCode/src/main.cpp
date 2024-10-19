@@ -221,30 +221,27 @@ void autonomous(){
   Controller1.Screen.print(" Seconds");
 }
 
-// void usercontrol(){
-//   while (true){
-//     runArcadeDrive(100, 60);
+void usercontrol(){
+  while (true){
+    runArcadeDrive(100, 60, true, Controller1.ButtonL1, 45);
 
-//     runIntake(85);
+    runIntake(85);
 
-//     runMogo();
+    runMogo();
 
-//     runDoinker();
-
-//     runArm(25, 5, 95, 0.5, 5);
+    runDoinker();
     
-//     wait(20, msec);
-//   }
-// }
+    wait(20, msec);
+  }
+}
 
 int main(){
-  runAutonRedSoloAWP();
-  // Competition.drivercontrol(usercontrol);
-  // Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+  Competition.autonomous(autonomous);
 
-  // preAuton();
+  preAuton();
 
-  // while (true){
-  //   wait(20, msec);
-  // }
+  while (true){
+    wait(20, msec);
+  }
 }
