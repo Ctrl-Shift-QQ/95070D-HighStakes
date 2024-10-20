@@ -16,7 +16,7 @@ controller Controller1 = controller(primary);
 motor LeftFront = motor(PORT3, ratio6_1, true);
 motor LeftBack = motor(PORT4, ratio6_1, true);
 motor LeftStack = motor(PORT5, ratio6_1, true);
-motor RightFront = motor(PORT1, ratio6_1, false);
+motor RightFront = motor(PORT6, ratio6_1, false);
 motor RightBack = motor(PORT2, ratio6_1, false);
 motor RightStack = motor(PORT11, ratio6_1, false);
 motor_group LeftDrive(LeftFront, LeftBack, LeftStack);

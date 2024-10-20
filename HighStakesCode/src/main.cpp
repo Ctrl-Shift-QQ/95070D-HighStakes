@@ -223,7 +223,7 @@ void autonomous(){
 
 void usercontrol(){
   while (true){
-    runArcadeDrive(100, 60, true, Controller1.ButtonL1, 45);
+    runArcadeDrive(100, 60, true, Controller1.ButtonL1, 40);
 
     runIntake(85);
 
