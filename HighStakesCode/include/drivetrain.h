@@ -50,6 +50,7 @@ class Drivetrain {
         /******************** Motion algorithms ********************/
 
         void driveToPoint(double targetX, double targetY);
+        void driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants);
         void driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants);
         void driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants, outputConstants turnOutputConstants);
 
@@ -66,9 +67,9 @@ class Drivetrain {
         void turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants);
         void turnToPoint(bool reversed, double targetX, double targetY, settleConstants turnSettleConstants, outputConstants turnOutputConstants);
 
-        void swingToHeading(std::string side, double target);
-        void swingToHeading(std::string side, double target, outputConstants swingOutputConstants);
-        void swingToHeading(std::string side, double target, double kp, double ki, double kd, double startI, double minimumSpeed, double deadband, double loopCycleTime, double settleTime, double timeout);
+        void swingToHeading(std::string driveSide, double target);
+        void swingToHeading(std::string driveSide, double target, settleConstants swingSettleConstants);
+        void swingToHeading(std::string driveSide, double target, settleConstants swingSettleConstants, outputConstants swingOutputConstants);
 
         void stopDrive(brakeType brakeType);
 };

@@ -29,6 +29,10 @@ void Drivetrain::driveToPoint(double targetX, double targetY){
     driveToPoint(targetX, targetY, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultTurnOutputConstants); 
 }
 
+void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants){
+    driveToPoint(targetX, targetY, driveSettleConstants, defaultDriveOutputConstants, defaultTurnOutputConstants); 
+}
+
 void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
     driveToPoint(targetX, targetY, driveSettleConstants, driveOutputConstants, defaultTurnOutputConstants);
 }
@@ -45,8 +49,8 @@ void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants dr
     }
     double driveOutput = 0;
     double turnOutput = 0;
-    double leftDriveOutput = 0;
-    double rightDriveOutput = 0;
+    double leftSideOutput = 0;
+    double rightSideOutput = 0;
     
     //Double PID (drives and turns toward the target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
@@ -72,11 +76,11 @@ void Drivetrain::driveToPoint(double targetX, double targetY, settleConstants dr
         driveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, driveOutputConstants.maximumSpeed, driveOutput, driveOutput);
         turnOutput *= driveOutputScale(turnOutputConstants.minimumSpeed, turnOutputConstants.maximumSpeed, turnOutput, turnOutput);
 
-        leftDriveOutput = driveOutput + turnOutput;
-        rightDriveOutput = driveOutput - turnOutput;
+        leftSideOutput = driveOutput + turnOutput;
+        rightSideOutput = driveOutput - turnOutput;
 
-        LeftDrive.spin(forward, leftDriveOutput, percent);
-        RightDrive.spin(forward, rightDriveOutput, percent);
+        LeftDrive.spin(forward, leftSideOutput, percent);
+        RightDrive.spin(forward, rightSideOutput, percent);
 
         wait(driveSettleConstants.loopCycleTime, msec);
     }
@@ -104,8 +108,8 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, sett
     double turnError = headingError(targetHeading, odom.orientation);
     double driveOutput = 0;
     double turnOutput = 0;
-    double leftDriveOutput = 0;
-    double rightDriveOutput = 0;
+    double leftSideOutput = 0;
+    double rightSideOutput = 0;
 
     //Double PID (drives and aligns towards target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
@@ -123,11 +127,11 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, sett
         driveOutput *= driveOutputScale(driveOutputConstants.minimumSpeed, driveOutputConstants.maximumSpeed, driveOutput, driveOutput);
         turnOutput *= driveOutputScale(defaultDriveDistanceTurnOutputConstants.minimumSpeed, defaultDriveDistanceTurnOutputConstants.maximumSpeed, turnOutput, turnOutput);
         
-        leftDriveOutput = driveOutput + turnError;
-        rightDriveOutput = driveOutput - turnError;
+        leftSideOutput = driveOutput + turnError;
+        rightSideOutput = driveOutput - turnError;
 
-        LeftDrive.spin(forward, leftDriveOutput, percent);
-        RightDrive.spin(forward, rightDriveOutput, percent);
+        LeftDrive.spin(forward, leftSideOutput, percent);
+        RightDrive.spin(forward, rightSideOutput, percent);
 
         wait(driveSettleConstants.loopCycleTime, msec);
     }
@@ -146,7 +150,8 @@ void Drivetrain::turnToHeading(double targetHeading, settleConstants turnSettleC
     double turnError = headingError(targetHeading, odom.orientation);
     double turnOutput = 0;
 
-    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, turnSettleConstants.deadband, turnSettleConstants.loopCycleTime, turnSettleConstants.settleTime, turnSettleConstants.timeout);
+    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, 
+                           turnSettleConstants.deadband, turnSettleConstants.loopCycleTime, turnSettleConstants.settleTime, turnSettleConstants.timeout);
 
     while (!turnPID.isSettled(turnError)){
         turnError = headingError(targetHeading, odom.orientation);
@@ -185,15 +190,45 @@ void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, sett
 }
 
 
+void Drivetrain::swingToHeading(std::string driveSide, double target){
+    swingToHeading(driveSide, target, defaultSwingSettleConstants, defaultSwingOutputConstants);
+}
+
+void Drivetrain::swingToHeading(std::string driveSide, double target, settleConstants swingSettleConstants){
+    swingToHeading(driveSide, target, swingSettleConstants, defaultSwingOutputConstants);
+}
+
+void Drivetrain::swingToHeading(std::string driveSide, double target, settleConstants swingSettleConstants, outputConstants swingOutputConstants){
+    double swingError = headingError(target, odom.orientation);
+
+    double swingOutput = 0;
+
+    PID swingPID(swingError, swingOutputConstants.kp, swingOutputConstants.ki, swingOutputConstants.kd, swingOutputConstants.startI, swingSettleConstants.deadband, swingSettleConstants.loopCycleTime, swingSettleConstants.settleTime, swingSettleConstants.timeout);
+
+    while (!swingPID.isSettled(swingError)){
+        swingError = headingError(targetHeading, odom.orientation);
+
+        swingOutput = turnPID.output(turnError);
+
+        //Clamps the output speeds to stay within the specified minimum and maximum speeds
+        swingOutput *= driveOutputScale(swingOutputConstants.minimumSpeed, swingOutputConstants.maximumSpeed, swingOutput, -swingOutput);
+
+        if (driveSide == "Left"){
+            LeftDrive.spin(forward, turnOutput, percent);
+            RightDrive.stop(brake);
+        }
+        else {
+            LeftDrive.stop(brake);
+            RightDrive.spin(forward, -turnOutput, percent);
+        }
+
+        wait(turnSettleConstants.loopCycleTime, msec);
+    }
+    
+}
+
+
 void Drivetrain::stopDrive(brakeType brakeType){
     LeftDrive.stop(brakeType);
     RightDrive.stop(brakeType);
 }
-
-
-
-
-
-
-
-

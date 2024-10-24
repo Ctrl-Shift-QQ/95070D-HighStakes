@@ -6,40 +6,52 @@
 
 void setDefaultPIDConstants(){
     //Drive constants
-    chassis.defaultDriveOutputConstants.kp = 2.5;
+    chassis.defaultDriveOutputConstants.kp = 0;
     chassis.defaultDriveOutputConstants.ki = 0;
-    chassis.defaultDriveOutputConstants.kd = 0.1;
+    chassis.defaultDriveOutputConstants.kd = 0;
     chassis.defaultDriveOutputConstants.startI = 0;
-    chassis.defaultDriveOutputConstants.minimumSpeed = 15;
-    chassis.defaultDriveOutputConstants.maximumSpeed = 40;
-    chassis.defaultDriveSettleConstants.deadband = 0.75;
-    chassis.defaultDriveSettleConstants.loopCycleTime = 20;
-    chassis.defaultDriveSettleConstants.settleTime = 1000;
-    chassis.defaultDriveSettleConstants.timeout = 5000;
+    chassis.defaultDriveOutputConstants.minimumSpeed = 0;
+    chassis.defaultDriveOutputConstants.maximumSpeed = 0;
+    chassis.defaultDriveSettleConstants.deadband = 0;
+    chassis.defaultDriveSettleConstants.loopCycleTime = 0;
+    chassis.defaultDriveSettleConstants.settleTime = 0;
+    chassis.defaultDriveSettleConstants.timeout = 0;
 
     //Drive Distance Turn Constants
-    chassis.defaultDriveDistanceTurnOutputConstants.kp = 0.3;
+    chassis.defaultDriveDistanceTurnOutputConstants.kp = 0;
     chassis.defaultDriveDistanceTurnOutputConstants.ki = 0;
     chassis.defaultDriveDistanceTurnOutputConstants.kd = 0;
     chassis.defaultDriveDistanceTurnOutputConstants.startI = 0;
     chassis.defaultDriveDistanceTurnOutputConstants.minimumSpeed = 0;
-    chassis.defaultDriveDistanceTurnOutputConstants.maximumSpeed = 5;
-    chassis.defaultDriveDistanceTurnSettleConstants.deadband = 0.25;
+    chassis.defaultDriveDistanceTurnOutputConstants.maximumSpeed = 0;
+    chassis.defaultDriveDistanceTurnSettleConstants.deadband = 0;
     chassis.defaultDriveDistanceTurnSettleConstants.loopCycleTime = 0;
     chassis.defaultDriveDistanceTurnSettleConstants.settleTime = 0;
     chassis.defaultDriveDistanceTurnSettleConstants.timeout = 0;
 
     //Turn Constants
-    chassis.defaultTurnOutputConstants.kp = 0.6;
-    chassis.defaultTurnOutputConstants.ki = 0.01;
-    chassis.defaultTurnOutputConstants.kd = 1.75;
-    chassis.defaultTurnOutputConstants.startI = 5;
-    chassis.defaultTurnOutputConstants.minimumSpeed = 3;
-    chassis.defaultTurnOutputConstants.maximumSpeed = 75;
-    chassis.defaultTurnSettleConstants.deadband = 2;
-    chassis.defaultTurnSettleConstants.loopCycleTime = 20;
-    chassis.defaultTurnSettleConstants.settleTime = 1000;
-    chassis.defaultTurnSettleConstants.timeout = 2500;
+    chassis.defaultTurnOutputConstants.kp = 0;
+    chassis.defaultTurnOutputConstants.ki = 0;
+    chassis.defaultTurnOutputConstants.kd = 0;
+    chassis.defaultTurnOutputConstants.startI = 0;
+    chassis.defaultTurnOutputConstants.minimumSpeed = 0;
+    chassis.defaultTurnOutputConstants.maximumSpeed = 0;
+    chassis.defaultTurnSettleConstants.deadband = 0;
+    chassis.defaultTurnSettleConstants.loopCycleTime = 0;
+    chassis.defaultTurnSettleConstants.settleTime = 0;
+    chassis.defaultTurnSettleConstants.timeout = 0;
+
+    //Swing Constants
+    chassis.defaultSwingOutputConstants.kp = 0;
+    chassis.defaultSwingOutputConstants.ki = 0;
+    chassis.defaultSwingOutputConstants.kd = 0;
+    chassis.defaultSwingOutputConstants.startI = 0;
+    chassis.defaultSwingOutputConstants.minimumSpeed = 0;
+    chassis.defaultSwingOutputConstants.maximumSpeed = 0;
+    chassis.defaultSwingSettleConstants.deadband = 0;
+    chassis.defaultSwingSettleConstants.loopCycleTime = 0;
+    chassis.defaultSwingSettleConstants.settleTime = 0;
+    chassis.defaultSwingSettleConstants.timeout = 0;
 }
 
 /******************** Tasks ********************/
