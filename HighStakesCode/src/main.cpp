@@ -17,7 +17,7 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
-Drivetrain chassis(2.75, -2.5, 0); //Initializes chassis
+static bool runningPreAuton = true; //Prevents driver control from running during pre-auton
 
 typedef enum { //Enum for each of the autons
   AutonNone = 0,
@@ -31,13 +31,12 @@ typedef enum { //Enum for each of the autons
   AutonBlueGoalRush,
   AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
 } Auton;
+static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-static Auton currentAuton = AutonNone; //Initializes currentAuton 
+Drivetrain chassis(2.75, -2.25, 0.125); //Initializes chassis
+
 
 void preAuton(){
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
-
   //Sensor reset and calibration
   ArmRotation.resetPosition();
 
@@ -48,14 +47,12 @@ void preAuton(){
   wait(3, sec);
   Controller1.Screen.clearScreen();
 
-
   //Auton Selector
   bool selectingSide = true;
   bool redAlliance; //True = red, False = blue
   bool selectingAuton = true;
 
   while (selectingSide){ //Selects the alliance color
-    Controller1.Screen.clearScreen();
     Controller1.Screen.setCursor(1, 6);
     Controller1.Screen.print("Alliance Color");
 
@@ -73,20 +70,24 @@ void preAuton(){
     }
     
     if (pressed(Left)){ //Press left button to select red alliance
+      Controller1.Screen.clearScreen();
+
       redAlliance = true;
     }
 
     if (pressed(Right)){ //Press right button to select blue alliance
+      Controller1.Screen.clearScreen();
+
       redAlliance = false;
     }
 
-    if (Controller1.ButtonUp.pressing()){ //Press up button to select
+    if (pressed(Up)){ //Press up button to select
       Controller1.Screen.clearScreen();
 
       selectingSide = false;
     }
 
-    wait(30, msec);
+    wait(20, msec);
   }
 
   wait(50, msec);
@@ -159,17 +160,19 @@ void preAuton(){
       }
     }
 
-    if (Controller1.ButtonUp.pressing()){ //Press up button to select
+    if (pressed(Up)){ //Press up button to select
       Controller1.Screen.clearScreen();
 
       selectingAuton = false; //Exits loop
     }
     
-    wait(30, msec);
+    wait(20, msec);
   }
 
   wait(50, msec);
   Controller1.rumble("-.-.");
+
+  runningPreAuton = false;
 }
 
 void autonomous(){
@@ -223,17 +226,22 @@ void autonomous(){
 
 void usercontrol(){
   while (true){
-    runArcadeDrive(100, 60, true, Controller1.ButtonL1, 40);
+    if (!runningPreAuton){
+      runArcadeDrive(100, 60, true, Controller1.ButtonL1, 40);
 
-    runIntake(85);
-
-    runMogo();
-
-    runDoinker();
+      runIntake();
     
-    wait(20, msec);
+      runArm();
+
+      runMogo();
+
+      runDoinker();
+    }
+    
+    wait(20, msec); 
   }
 }
+
 
 int main(){
   Competition.drivercontrol(usercontrol);

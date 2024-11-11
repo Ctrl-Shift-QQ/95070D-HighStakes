@@ -18,8 +18,12 @@ PID::PID(double startError, double kp, double ki, double kd, double startI, doub
 {};
 
 double PID::output(double error){
-    if (fabs(error) < startI){
+    if (fabs(error) < fabs(startError) && fabs(error) < startI){
         integral += error;
+    }
+
+    if (getSign(error) != getSign(startError)){ //Checks if error has crossed 0
+        integral = 0;
     }
     
     derivative = previousError - error;

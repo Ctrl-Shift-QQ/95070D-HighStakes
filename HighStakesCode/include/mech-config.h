@@ -1,0 +1,15 @@
+#define INTAKE_FORWARD_BUTTON Controller1.ButtonR1
+#define INTAKE_REVERSE_BUTTON Controller1.ButtonR2
+#define INTAKE_STOP_BUTTON Controller1.ButtonB
+#define INTAKE_DEFAULT_SPEED 85
+
+#define ARM_SPIN_BUTTON Controller1.ButtonL1
+#define ARM_TOGGLE_STATE_BUTTON Controller.ButtonUp
+#define ARM_MANUAL_SPEED 95
+#define ARM_INTAKE_SPEED 10
+#define ARM_LOADING_POSITION 18
+#define ARM_MACRO_KP 0.7
+
+#define MOGO_BUTTON_ID A
+
+#define DOINKER_BUTTON_ID X

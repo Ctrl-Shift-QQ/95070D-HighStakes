@@ -6,17 +6,23 @@ void setDefaultPIDConstants();
 
 /******************** Tasks ********************/
 
-extern bool redAlliance;
-
 int colorSort();
 
 int armDown();
 
 int armLoad();
 
-/******************** Autons ********************/
+/******************** Tests ********************/
 
 void runOdomTest();
+
+void runDriveTest();
+
+void runTurnTest();
+
+void runSwingTest();
+
+/******************** Autons ********************/
 
 void runAutonRedSoloAWP();
 
@@ -34,6 +40,6 @@ void runAutonBlueStackAWP();
 
 void runAutonBlueGoalRush();
 
-/******************** PID Tunings ********************/
+/******************** Prog Skills ********************/
 
 void runProgSkills();

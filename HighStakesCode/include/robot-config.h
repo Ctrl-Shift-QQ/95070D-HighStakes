@@ -24,11 +24,3 @@ extern encoder SidewaysTracker;
 extern encoder ForwardTracker;
 extern digital_out MogoMech;
 extern digital_out Doinker;
-
-
-/**
- * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
- * 
- * This should be called at the start of your int main function.
- */
-void  vexcodeInit( void );

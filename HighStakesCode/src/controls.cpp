@@ -2,8 +2,8 @@
 #include "controls.h"
 #include <iostream>
 
-controller dummyController;
-controller::button nullButton = dummyController.ButtonA; //Placeholder for button when valid button not wanted
+static controller dummyController;
+static controller::button nullButton = dummyController.ButtonA; //Placeholder for button when valid button not wanted
 
 void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton){ //Tap seperate buttons for spin forward, spin reverse, and stop
@@ -144,7 +144,7 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID){ //Toggl
     }
 }
 
-/********** Controls **********/
+/******************** Controls ********************/
 
 void runTankDrive(double percentSpeed, bool toggleSpeed, const controller::button &toggleSpeedButton, double slowPercentSpeed){ //Each joystick controls the movement of the corresponding side of the drivetrain
     double leftDriveSpeed = Controller1.Axis3.position(percent) * percentSpeed / 100;
@@ -172,17 +172,17 @@ void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSp
     RightDrive.spin(forward, rightDriveSpeed, percent);
 }
 
-void runIntake(double percentSpeed){
-    motorSeperateButton(percentSpeed, Intake, Controller1.ButtonR1, Controller1.ButtonR2, Controller1.ButtonB);
+void runIntake(){
+    motorSeperateButton(INTAKE_DEFAULT_SPEED, Intake, INTAKE_FORWARD_BUTTON, INTAKE_REVERSE_BUTTON, INTAKE_STOP_BUTTON);
 }
 
-void runArm(double loadingPosition, double manualSpeed, double macroKp, double intakeSpeed){
+void runArm(){
     static bool loadingState = false; //True = loading, False = down
     static double targetPosition = 0;
 
-    if (Controller1.ButtonL1.pressing()){ //Manual
-        motorHold(manualSpeed, Arm, Controller1.ButtonL1, nullButton);
-        motorHold(intakeSpeed, Intake, nullButton, Controller1.ButtonL1);
+    if (ARM_SPIN_BUTTON.pressing()){ //Manual
+        motorHold(ARM_MANUAL_SPEED, Arm, ARM_SPIN_BUTTON, nullButton);
+        motorHold(ARM_INTAKE_SPEED, Intake, nullButton, ARM_SPIN_BUTTON);
     }
     else { //Macro
         if (pressed(Up)){
@@ -190,21 +190,21 @@ void runArm(double loadingPosition, double manualSpeed, double macroKp, double i
         }
         
         if (loadingState){
-            targetPosition = loadingPosition;
+            targetPosition = ARM_LOADING_POSITION;
         }
         else {
             targetPosition = 0;
         }
 
-        Arm.spin(forward, macroKp * (targetPosition - ArmRotation.position(degrees)), percent);
+        Arm.spin(forward, ARM_MACRO_KP * (targetPosition - ArmRotation.position(degrees)), percent);
     }
 }
 
 void runMogo(){
-    pistonToggle(MogoMech, A);
+    pistonToggle(MogoMech, MOGO_BUTTON_ID);
 }
 
 void runDoinker(){
-    pistonToggle(Doinker, X);
+    pistonToggle(Doinker, DOINKER_BUTTON_ID);
 }
 

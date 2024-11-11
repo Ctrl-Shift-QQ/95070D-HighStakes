@@ -35,7 +35,7 @@ void Odometry::updatePosition(){
     double localXPosition;
     double localYPosition;
 
-    //Gets local Cartesian coordinates of new position
+    //Gets local Cartesian translation coordinates of new position
     if (orientationDeltaRad == 0){
         localXPosition = sidewaysPositionDelta;
         localYPosition = forwardPositionDelta;
@@ -45,7 +45,7 @@ void Odometry::updatePosition(){
         localYPosition = 2 * (forwardPositionDelta / orientationDeltaRad + forwardToCenterDistance) * sin(orientationDeltaRad / 2);
     }
 
-    //Converts Cartesian coordinates to polar coordinates and local to global
+    //Converts Cartesian translation coordinates to polar and local to global
     double localPolarAngle = atan2(localYPosition, localXPosition);
     double globalPolarAngle = localPolarAngle - previousOrientationRad - orientationDeltaRad / 2;
     double polarLength = sqrt(pow(localXPosition, 2) + pow(localYPosition, 2));

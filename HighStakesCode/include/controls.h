@@ -1,3 +1,5 @@
+#include "mech-config.h"
+
 void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton);
 void pistonSeperateButton(digital_out &controlPiston, const controller::button &extendButton, const controller::button &retractButton);
@@ -21,11 +23,11 @@ bool pressed(ButtonID controlButtonID);
 void motorToggle(directionType motorDirection, double motorVelocity, motor_group &controlMotor, ButtonID controlButtonID);
 void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
 
-/********** Controls **********/
+/******************** Controls ********************/
 
 void runTankDrive(double percentSpeed, bool toggleSpeed = false, const controller::button &toggleSpeedButton = Controller1.ButtonA, double slowPercentSpeed = 0);
 void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, const controller::button &toggleSpeedButton = Controller1.ButtonA, double slowPercentSpeed = 0);
-void runIntake(double percentSpeed);
-void runArm(double loadingPosition, double manualSpeed, double macroKp, double intakeSpeed);
+void runIntake();
+void runArm();
 void runMogo();
 void runDoinker();
