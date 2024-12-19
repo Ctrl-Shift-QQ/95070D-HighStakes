@@ -1,16 +1,16 @@
 {
 	"extension": {
-		"version": "0.6.0",
+		"version": "0.6.1",
 		"json": 2
 	},
 	"project": {
 		"name": "HighStakesCode",
 		"description": "Vex V5RC Team 95070D High Stakes Season Code",
-		"creationDate": "7/8/2024, 4:25:23 PM",
+		"creationDate": "Wed, 27 Nov 2024 21:09:40 GMT",
 		"platform": "V5",
 		"language": "cpp",
 		"slot": 1,
-		"sdkVersion": "V5_20240223_11_00_00",
+		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
 			"includePath": [],
 			"printf_float": true

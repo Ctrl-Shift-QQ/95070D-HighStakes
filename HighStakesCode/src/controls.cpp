@@ -5,14 +5,13 @@
 static controller dummyController;
 static controller::button nullButton = dummyController.ButtonA; //Placeholder for button when valid button not wanted
 
-void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
+void motorSeperateButton(double percentSpeed, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton){ //Tap seperate buttons for spin forward, spin reverse, and stop
-
     if (spinForwardButton.pressing()){
-        controlMotor.spin(forward, motorVelocity, percent);
+        controlMotor.spin(forward, percentToVolts(percentSpeed), volt);
     }
     else if (spinReverseButton.pressing()){
-        controlMotor.spin(reverse, motorVelocity, percent);
+        controlMotor.spin(reverse, percentToVolts(percentSpeed), volt);
     }
     else if (stopButton.pressing()){
         controlMotor.stop(brake);
@@ -28,13 +27,12 @@ void pistonSeperateButton(digital_out &controlPiston, const controller::button &
     }
 }
 
-void motorHold(double motorVelocity, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton){ //Hold button to spin
-
+void motorHold(double percentSpeed, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton){ //Hold button to spin
     if (forwardButton.pressing()){
-        controlMotor.spin(forward, motorVelocity, percent);
+        controlMotor.spin(forward, percentToVolts(percentSpeed), volt);
     }
     else if (reverseButton.pressing()){
-        controlMotor.spin(reverse, motorVelocity, percent);
+        controlMotor.spin(reverse, percentToVolts(percentSpeed), volt);
     }
     else {
         controlMotor.stop(brake);
@@ -120,14 +118,14 @@ bool pressed(ButtonID controlButtonID){ //Detects new presses
     return false;
 }
 
-void motorToggle(directionType motorDirection, double motorVelocity, motor_group &controlMotor, ButtonID controlButtonID){ //Toggle button to spin/stop
+void motorToggle(directionType motorDirection, double percentSpeed, motor_group &controlMotor, ButtonID controlButtonID){ //Toggle button to spin/stop
     static bool motorState = false;
 
     if (pressed(controlButtonID)){
         motorState = !motorState;
 
         if (motorState){
-            controlMotor.spin(motorDirection, motorVelocity, percent);
+            controlMotor.spin(motorDirection, percentToVolts(percentSpeed), volt);
         }
         else {
             controlMotor.stop(brake);
@@ -155,8 +153,8 @@ void runTankDrive(double percentSpeed, bool toggleSpeed, const controller::butto
         rightDriveSpeed *= slowPercentSpeed / 100;
     }
 
-    LeftDrive.spin(forward, leftDriveSpeed, percent);
-    RightDrive.spin(forward, rightDriveSpeed, percent);
+    LeftDrive.spin(forward, percentToVolts(leftDriveSpeed), volt);
+    RightDrive.spin(forward, percentToVolts(rightDriveSpeed), volt);
 }
 
 void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed, const controller::button &toggleSpeedButton, double slowPercentSpeed){ //Left joystick up/down controls forward backward, right joystick left/right controls turning
@@ -168,8 +166,8 @@ void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSp
         rightDriveSpeed *= slowPercentSpeed / 100;
     }
 
-    LeftDrive.spin(forward, leftDriveSpeed, percent);
-    RightDrive.spin(forward, rightDriveSpeed, percent);
+    LeftDrive.spin(forward, percentToVolts(leftDriveSpeed), volt);
+    RightDrive.spin(forward, percentToVolts(rightDriveSpeed), volt);
 }
 
 void runIntake(){
@@ -177,26 +175,32 @@ void runIntake(){
 }
 
 void runArm(){
-    static bool loadingState = false; //True = loading, False = down
+    static bool runningMacro = false;
+    static int currentMacro = 0; //Used for indexing
+    static double macroPositions = {0, ARM_LOADING_POSITION};
     static double targetPosition = 0;
 
-    if (ARM_SPIN_BUTTON.pressing()){ //Manual
-        motorHold(ARM_MANUAL_SPEED, Arm, ARM_SPIN_BUTTON, nullButton);
+    if (ARM_SPIN_FORWARD_BUTTON.pressing() || ARM_SPIN_REVERSE_BUTTON.pressing()){ //Toggles arm control state
+        runningMacro = false;
+    }
+    else if (pressed(ARM_TOGGLE_STATE_BUTTON_ID)){
+        runningMacro = true;
+    }
+
+    if (!runningMacro){ //Manual
+        motorHold(ARM_MANUAL_SPEED, Arm, ARM_SPIN_BUTTON, ARM_SPIN_REVERSE_BUTTON);
         motorHold(ARM_INTAKE_SPEED, Intake, nullButton, ARM_SPIN_BUTTON);
     }
     else { //Macro
-        if (pressed(Up)){
-            loadingState = !loadingState;
-        }
-        
-        if (loadingState){
-            targetPosition = ARM_LOADING_POSITION;
+        if (currentMacro > (sizeof(macroPositions) / sizeof(macroPositions[0])) - 1){
+            currentMacro = 0;
         }
         else {
-            targetPosition = 0;
+            currentMacro++;
         }
 
-        Arm.spin(forward, ARM_MACRO_KP * (targetPosition - ArmRotation.position(degrees)), percent);
+        targetPosition = macroPositions[currentMacro];
+        Arm.spin(forward, percentToVolts(ARM_MACRO_KP * (targetPosition - ArmRotation.position(degrees))), volt);
     }
 }
 

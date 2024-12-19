@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2.75, -2.25, 0.125); //Initializes chassis
+Drivetrain chassis(2, 2.5, -0.75, 360/358.8); //Initializes chassis
 
 
 void preAuton(){
@@ -227,7 +227,7 @@ void autonomous(){
 void usercontrol(){
   while (true){
     if (!runningPreAuton){
-      runArcadeDrive(100, 60, true, Controller1.ButtonL1, 40);
+      runArcadeDrive(100, 80);
 
       runIntake();
     

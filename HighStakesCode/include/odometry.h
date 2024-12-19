@@ -9,8 +9,9 @@ class Odometry {
         double wheelDiameter;
         double sidewaysToCenterDistance;
         double forwardToCenterDistance;
+        double inertialScale; //Accounts for IMU inaccuracy
     public:
-        Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance); //Constructor
+        Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
 
         double xPosition;
         double yPosition;

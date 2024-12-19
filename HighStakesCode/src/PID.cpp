@@ -19,15 +19,15 @@ PID::PID(double startError, double kp, double ki, double kd, double startI, doub
 
 double PID::output(double error){
     if (fabs(error) < fabs(startError) && fabs(error) < startI){
-        integral += error;
+        this->integral += error;
     }
 
     if (getSign(error) != getSign(startError)){ //Checks if error has crossed 0
-        integral = 0;
+        this->integral = 0;
     }
     
-    derivative = previousError - error;
-    previousError = error;
+    this->derivative = previousError - error;
+    this->previousError = error;
 
     return error * kp + integral * ki - derivative * kd;
 }
@@ -37,7 +37,7 @@ bool PID::isSettled(double error){
         return true;
     }
 
-    timeSpent += loopCycleTime;
+    this->timeSpent += loopCycleTime;
 
     return false;
 }

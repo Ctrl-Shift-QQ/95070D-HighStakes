@@ -2,10 +2,11 @@
 #include "odometry.h"
 #include <iostream>
 
-Odometry::Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance) :
+Odometry::Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale) :
     wheelDiameter(wheelDiameter),
     sidewaysToCenterDistance(sidewaysToCenterDistance),
-    forwardToCenterDistance(forwardToCenterDistance)
+    forwardToCenterDistance(forwardToCenterDistance),
+    inertialScale(inertialScale)
 {};
 
 void Odometry::setPosition(double xPosition, double yPosition, double orientation){
@@ -15,25 +16,29 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     this->orientation = orientation;
     this->previousSidewaysPosition = 0;
     this->previousForwardPosition = 0;
-    this->previousOrientationRad = orientation * M_PI / 180;
+    this->previousOrientationRad = degToRad(orientation);
 
     //Sets sensor values accordingly
-    Inertial.setHeading(orientation, degrees);
-    SidewaysTracker.resetRotation();
-    ForwardTracker.resetRotation();
+    Inertial.setRotation(orientation, degrees);
+    SidewaysTracker.resetPosition();
+    ForwardTracker.resetPosition();
 }
 
 void Odometry::updatePosition(){
     //Saves values so that they don't change during the same cycle
     double sidewaysTrackerPosition = SidewaysTracker.position(turns);
     double forwardTrackerPosition = ForwardTracker.position(turns);
-    double orientationRad = degToRad(Inertial.heading(degrees));
+    double orientationRad = degToRad(fmod(fmod(Inertial.rotation(degrees) * inertialScale, 360) + 360, 360));
     double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * wheelDiameter * M_PI; //Gets change in inches
     double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * wheelDiameter * M_PI; //Gets change in inches
     double orientationDeltaRad = orientationRad - previousOrientationRad;
-    
     double localXPosition;
     double localYPosition;
+    double localPolarAngle;
+    double globalPolarAngle;
+    double polarLength;
+    double xPositionDelta;
+    double yPositionDelta;
 
     //Gets local Cartesian translation coordinates of new position
     if (orientationDeltaRad == 0){
@@ -46,13 +51,13 @@ void Odometry::updatePosition(){
     }
 
     //Converts Cartesian translation coordinates to polar and local to global
-    double localPolarAngle = atan2(localYPosition, localXPosition);
-    double globalPolarAngle = localPolarAngle - previousOrientationRad - orientationDeltaRad / 2;
-    double polarLength = sqrt(pow(localXPosition, 2) + pow(localYPosition, 2));
+    localPolarAngle = atan2(localYPosition, localXPosition);
+    globalPolarAngle = localPolarAngle - previousOrientationRad - orientationDeltaRad / 2;
+    polarLength = sqrt(pow(localXPosition, 2) + pow(localYPosition, 2));
 
     //Calculates global offset
-    double xPositionDelta = cos(globalPolarAngle) * polarLength;
-    double yPositionDelta = sin(globalPolarAngle) * polarLength;
+    xPositionDelta = cos(globalPolarAngle) * polarLength;
+    yPositionDelta = sin(globalPolarAngle) * polarLength;
 
     //Adds change to total value to get actual values
     this->xPosition += xPositionDelta;

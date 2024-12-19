@@ -1,9 +1,10 @@
 #include "mech-config.h"
+#include "util.h"
 
-void motorSeperateButton(double motorVelocity, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
+void motorSeperateButton(double percentSpeed, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton);
 void pistonSeperateButton(digital_out &controlPiston, const controller::button &extendButton, const controller::button &retractButton);
-void motorHold(double motorVelocity, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton);
+void motorHold(double percentSpeed, motor_group &controlMotor, const controller::button &forwardButton, const controller::button &reverseButton);
 void pistonHold(bool reverse, digital_out &controlPiston, const controller::button &controlButton);
 typedef enum { //For pressed function
     Up = 0,
@@ -20,7 +21,7 @@ typedef enum { //For pressed function
     R2, 
 } ButtonID;
 bool pressed(ButtonID controlButtonID);
-void motorToggle(directionType motorDirection, double motorVelocity, motor_group &controlMotor, ButtonID controlButtonID);
+void motorToggle(directionType motorDirection, double percentSpeed, motor_group &controlMotor, ButtonID controlButtonID);
 void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
 
 /******************** Controls ********************/

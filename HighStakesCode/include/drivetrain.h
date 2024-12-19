@@ -10,7 +10,7 @@ class Drivetrain {
         task positionTrackTask;
 
     public:
-        Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance); //Constructor
+        Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
 
         /******************** Odometry ********************/
 
@@ -60,7 +60,7 @@ class Drivetrain {
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants);
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants);
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants);
-        void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, settleConstants turnSettleConstants, outputConstants turnOutputConstants);
+        void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, outputConstants turnOutputConstants);
 
         void driveDistance(double targetDistance);
         void driveDistance(double targetDistance, double targetHeading);

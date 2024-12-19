@@ -74,3 +74,7 @@ double driveOutputScale(double minimumSpeed, double maximumSpeed, double leftDri
     
     return 1;
 }
+
+double percentToVolts(double percentage){
+    return percentage / 100 * 12;
+}

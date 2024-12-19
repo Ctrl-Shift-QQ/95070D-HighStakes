@@ -3,12 +3,13 @@
 #define INTAKE_STOP_BUTTON Controller1.ButtonB
 #define INTAKE_DEFAULT_SPEED 85
 
-#define ARM_SPIN_BUTTON Controller1.ButtonL1
-#define ARM_TOGGLE_STATE_BUTTON Controller.ButtonUp
+#define ARM_SPIN_FORWARD_BUTTON Controller1.ButtonL1
+#define ARM_SPIN_REVERSE_BUTTON Controller1.ButtonL2
+#define ARM_TOGGLE_STATE_BUTTON_ID Up
 #define ARM_MANUAL_SPEED 95
 #define ARM_INTAKE_SPEED 10
-#define ARM_LOADING_POSITION 18
-#define ARM_MACRO_KP 0.7
+#define ARM_LOADING_POSITION 50
+#define ARM_MACRO_KP 1
 
 #define MOGO_BUTTON_ID A
 
