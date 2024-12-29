@@ -2,8 +2,8 @@
 #include "drivetrain.h"
 #include <iostream>
 
-Drivetrain::Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale):
-    odom(wheelDiameter, sidewaysToCenterDistance, forwardToCenterDistance, inertialScale)
+Drivetrain::Drivetrain(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale):
+    odom(sidewaysWheelDiameter, forwardWheelDiameter, sidewaysToCenterDistance, forwardToCenterDistance, inertialScale)
 {};
 
 /******************** Odometry ********************/
@@ -58,7 +58,7 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
     
     //Double PID (drives and turns toward the target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, 0, 0, 0, 0);
+    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
         driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
@@ -72,7 +72,7 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
 
         driveOutput = drivePID.output(driveError) * cos(degToRad(headingError(turnTarget, odom.orientation)));
         turnOutput = turnPID.output(turnError);
-        if (fabs(turnError) < fabs(atan2(driveSettleConstants.deadband, driveError))){ //Prevents drastic turning when near the target, stops turning when facing point within deadband
+        if (fabs(turnError) < fabs(radToDeg(atan2(driveSettleConstants.deadband, driveError)))){ //Prevents drastic turning when near the target, stops turning when facing point within deadband
             turnOutput = 0;
         }
         
@@ -121,7 +121,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 
     //Double PID (drives and aligns towards target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.kp, 0, 0, 0, 0);
+    PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
         distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled

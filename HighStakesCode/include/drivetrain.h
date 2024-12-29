@@ -1,3 +1,5 @@
+#pragma once
+
 #include "odometry.h"
 #include "PID.h"
 #include <iostream>
@@ -10,7 +12,7 @@ class Drivetrain {
         task positionTrackTask;
 
     public:
-        Drivetrain(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
+        Drivetrain(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
 
         /******************** Odometry ********************/
 

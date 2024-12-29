@@ -1,5 +1,7 @@
+#pragma once
+
 #include "mech-config.h"
-#include "util.h"
+#include "PID.h"
 
 void motorSeperateButton(double percentSpeed, motor_group &controlMotor, const controller::button &spinForwardButton, const controller::button &spinReverseButton, 
                          const controller::button &stopButton);

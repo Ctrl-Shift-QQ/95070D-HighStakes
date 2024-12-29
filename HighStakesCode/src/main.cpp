@@ -1,18 +1,18 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       vex                                                       */
+/*    Author:       Jake He                                                   */
 /*    Created:      7/8/2024, 4:25:23 PM                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "autons.h"
+#include "mech-config.h"
 #include "controls.h"
 #include <iostream>
 
 using namespace vex;
-
 
 // A global instance of competition
 competition Competition;
@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2, 2.5, -0.75, 360/358.8); //Initializes chassis
+Drivetrain chassis(2, 2, 2.5, -0.75, 360/358.8); //Initializes chassis
 
 
 void preAuton(){
@@ -87,7 +87,7 @@ void preAuton(){
       selectingSide = false;
     }
 
-    wait(20, msec);
+    wait(DEFAULT_LOOP_CYCLE_TIME, msec);
   }
 
   wait(50, msec);
@@ -123,7 +123,7 @@ void preAuton(){
 
       if (redAlliance){
         if (currentAuton == AutonNone || currentAuton == redAutons[0]){ //Sets auton to last one if press left on first
-          currentAuton = redAutons[sizeof(redAutons) - 1];
+          currentAuton = redAutons[sizeof(redAutons) / sizeof(redAutons[0]) - 1];
         }
         else {
           currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1); //Sets auton to the one before it
@@ -131,7 +131,7 @@ void preAuton(){
       }
       else {
         if (currentAuton == AutonNone || currentAuton == blueAutons[0]){ //Sets auton to last one if press left on first
-          currentAuton = blueAutons[sizeof(redAutons) - 1];
+          currentAuton = blueAutons[sizeof(blueAutons) / sizeof(blueAutons[0]) - 1];
         }
         else {
           currentAuton = static_cast<Auton> (static_cast<int> (currentAuton) - 1); //Sets auton to the one before it
@@ -143,7 +143,7 @@ void preAuton(){
       Controller1.Screen.clearScreen();
 
       if (redAlliance){
-        if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) - 1]){ //Sets auton to first one if press right on last
+        if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) / sizeof(redAutons[0]) - 1]){ //Sets auton to first one if press right on last
           currentAuton = redAutons[0];
         }
         else {
@@ -151,7 +151,7 @@ void preAuton(){
         }
       }
       else {
-        if (currentAuton == AutonNone || currentAuton == blueAutons[sizeof(redAutons) - 1]){ //Sets auton to first one if press right on last
+        if (currentAuton == AutonNone || currentAuton == blueAutons[sizeof(blueAutons) / sizeof(blueAutons[0]) - 1]){ //Sets auton to first one if press right on last
           currentAuton = blueAutons[0];
         }
         else {
@@ -166,7 +166,7 @@ void preAuton(){
       selectingAuton = false; //Exits loop
     }
     
-    wait(20, msec);
+    wait(DEFAULT_LOOP_CYCLE_TIME, msec);
   }
 
   wait(50, msec);
@@ -227,7 +227,7 @@ void autonomous(){
 void usercontrol(){
   while (true){
     if (!runningPreAuton){
-      runArcadeDrive(100, 80);
+      runArcadeDrive(100, 100);
 
       runIntake();
     
@@ -238,7 +238,7 @@ void usercontrol(){
       runDoinker();
     }
     
-    wait(20, msec); 
+    wait(DEFAULT_LOOP_CYCLE_TIME, msec); 
   }
 }
 
@@ -250,6 +250,6 @@ int main(){
   preAuton();
 
   while (true){
-    wait(20, msec);
+    wait(DEFAULT_LOOP_CYCLE_TIME, msec);
   }
 }

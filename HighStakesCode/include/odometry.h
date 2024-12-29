@@ -1,3 +1,5 @@
+#pragma once
+
 #include "util.h"
 
 class Odometry {
@@ -6,12 +8,13 @@ class Odometry {
         double previousSidewaysPosition;
         double previousForwardPosition;
         double previousOrientationRad;
-        double wheelDiameter;
+        double sidewaysWheelDiameter;
+        double forwardWheelDiameter;
         double sidewaysToCenterDistance;
         double forwardToCenterDistance;
         double inertialScale; //Accounts for IMU inaccuracy
     public:
-        Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
+        Odometry(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
 
         double xPosition;
         double yPosition;

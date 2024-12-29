@@ -18,7 +18,9 @@ PID::PID(double startError, double kp, double ki, double kd, double startI, doub
 {};
 
 double PID::output(double error){
-    if (fabs(error) < fabs(startError) && fabs(error) < startI){
+    double loopsPerSec = 1000 / loopCycleTime;
+
+    if (fabs(error) < startI){
         this->integral += error;
     }
 
@@ -28,8 +30,8 @@ double PID::output(double error){
     
     this->derivative = previousError - error;
     this->previousError = error;
-
-    return error * kp + integral * ki - derivative * kd;
+    
+    return error * kp + integral / loopsPerSec * ki - derivative * loopsPerSec * kd;
 }
 
 bool PID::isSettled(double error){

@@ -1,3 +1,5 @@
+#pragma once
+
 double getSign(double input);
 
 double degToRad(double deg);

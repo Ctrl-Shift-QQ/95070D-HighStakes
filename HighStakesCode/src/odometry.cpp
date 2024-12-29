@@ -2,8 +2,9 @@
 #include "odometry.h"
 #include <iostream>
 
-Odometry::Odometry(double wheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale) :
-    wheelDiameter(wheelDiameter),
+Odometry::Odometry(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale) :
+    sidewaysWheelDiameter(sidewaysWheelDiameter),
+    forwardWheelDiameter(forwardWheelDiameter),
     sidewaysToCenterDistance(sidewaysToCenterDistance),
     forwardToCenterDistance(forwardToCenterDistance),
     inertialScale(inertialScale)
@@ -29,8 +30,8 @@ void Odometry::updatePosition(){
     double sidewaysTrackerPosition = SidewaysTracker.position(turns);
     double forwardTrackerPosition = ForwardTracker.position(turns);
     double orientationRad = degToRad(fmod(fmod(Inertial.rotation(degrees) * inertialScale, 360) + 360, 360));
-    double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * wheelDiameter * M_PI; //Gets change in inches
-    double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * wheelDiameter * M_PI; //Gets change in inches
+    double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * sidewaysWheelDiameter * M_PI; //Gets change in inches
+    double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * forwardWheelDiameter * M_PI; //Gets change in inches
     double orientationDeltaRad = orientationRad - previousOrientationRad;
     double localXPosition;
     double localYPosition;

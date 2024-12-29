@@ -1,4 +1,7 @@
+#pragma once
+
 #include "drivetrain.h"
+#include "PID.h"
 #include "mech-config.h"
 
 /******************** PID Tunings ********************/
@@ -9,9 +12,15 @@ void setDefaultPIDConstants();
 
 int colorSort();
 
-int armDown();
+void spinArmTo(double targetPosition);
 
-int armLoad();
+int armToDown();
+
+int armToLoad();
+
+int armToAllianceStake();
+
+int armToWallStake();
 
 /******************** Tests ********************/
 
