@@ -56,39 +56,104 @@ int colorSort(){
     return 0;
 }
 
-void spinArmTo(double targetPosition){
-    PID armPID(targetPosition, ARM_MACRO_KP, ARM_MACRO_KI, 0, ARM_MACRO_START_I, 0, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
- 
-    while (true){
-        Arm.spin(forward, percentToVolts(armPID.output(targetPosition - Arm.position(degrees))), volt);
+// void spinArmTo(double targetPosition){
+//     PID armPID(targetPosition, ARM_MACRO_KP, ARM_MACRO_KI, 0, ARM_MACRO_START_I, 0, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
 
-        wait(DEFAULT_LOOP_CYCLE_TIME, msec);
-    }
-}
+//     while (true){
+//         Arm.spin(forward, percentToVolts(armPID.output(targetPosition - Arm.position(degrees))), volt);
+//         wait(DEFAULT_LOOP_CYCLE_TIME, msec);
+//     }
+// }
+
+// int armToDown(){
+//     spinArmTo(0);
+
+//     return 0;
+// }
+
+// int armToLoad(){
+//     spinArmTo(ARM_LOADING_POSITION);
+
+//     return 0;
+// }
+
+// int armToAllianceStake(){
+//     spinArmTo(ARM_ALLIANCE_STAKE_POSITION);
+
+//     return 0;
+// }
+
+// int armToWallStake(){
+//     spinArmTo(ARM_WALL_STAKE_POSITION);
+
+//     return 0;
+// }
 
 int armToDown(){
-    spinArmTo(0);
+    while (true){
+        double output = ARM_MACRO_KP * -ArmRotation.position(degrees); 
+
+        if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
+            output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
+        }
+
+        Arm.spin(forward, percentToVolts(output), volt);
+        Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+
+        wait(20, msec);
+    }
 
     return 0;
 }
 
 int armToLoad(){
-    spinArmTo(ARM_LOADING_POSITION);
+    while (true){
+        double output = ARM_MACRO_KP * (ARM_LOADING_POSITION - ArmRotation.position(degrees));
+
+        if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
+            output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
+        }
+
+        Arm.spin(forward, percentToVolts(output), volt);
+        Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+
+        wait(20, msec);
+    }
 
     return 0;
 }
 
 int armToAllianceStake(){
-    spinArmTo(ARM_ALLIANCE_STAKE_POSITION);
+    while (true){
+        double output = ARM_MACRO_KP * (ARM_ALLIANCE_STAKE_POSITION - ArmRotation.position(degrees));
+        Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
 
-    return 0;
+        if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
+            output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
+        }
+
+        Arm.spin(forward, percentToVolts(output), volt);
+        Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+
+        wait(20, msec);
+    }
 }
 
 int armToWallStake(){
-    spinArmTo(ARM_WALL_STAKE_POSITION);
+    while (true){
+        double output = ARM_MACRO_KP * (ARM_WALL_STAKE_POSITION - ArmRotation.position(degrees));
 
-    return 0;
+        if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
+            output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
+        }
+
+        Arm.spin(forward, percentToVolts(output), volt);
+        Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+
+        wait(20, msec);
+    }
 }
+
 
 /******************** Tests ********************/
 
@@ -187,10 +252,14 @@ void runAutonBlueRushAWP(){
 void runAutonBlueStackAWP(){
     chassis.setCoordinates(57.5, 17, 180);
     setDefaultPIDConstants();
-    
+
     Drivetrain::clampConstants shortDriveClamp;
     shortDriveClamp.minimumSpeed = 0;
     shortDriveClamp.maximumSpeed = 50;
+
+    Drivetrain::clampConstants clampMogoClamp;
+    shortDriveClamp.minimumSpeed = 20;
+    shortDriveClamp.maximumSpeed = 70;
 
     Drivetrain::settleConstants shortDriveSettle;
     shortDriveSettle.deadband = 1;
@@ -206,16 +275,19 @@ void runAutonBlueStackAWP(){
     task scoreOnAlly = task(armToAllianceStake);
     chassis.turnToPoint(false, 71, 0); //One ring scored on ally stake;
 
-    wait(750, msec);
+    wait(500, msec);
     scoreOnAlly.stop();
     task resetArm = task(armToDown);
     MogoMech.set(true);
-    chassis.driveToPoint(24, 24);
+    chassis.driveToPoint(26, 23, clampMogoClamp);
+    chassis.stopDrive(brake);
+    wait(100, msec);
     MogoMech.set(false); //Mogo clamped
 
-    chassis.turnToPoint(false, 24, 48);
+    chassis.turnToPoint(false, 3, 45);
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
-    chassis.driveToPoint(24, 48);
+    chassis.driveToPoint(12, 36);
+    // chassis.swingToHeading("Right", 0);
 
     std::cout << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
 

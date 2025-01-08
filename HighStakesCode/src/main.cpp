@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2, 2, 2.5, -0.75, 360/358.8); //Initializes chassis
+Drivetrain chassis(2.75, 3.25, 2.75, 7.75, 360/358.5); //Initializes chassis
 
 
 void preAuton(){

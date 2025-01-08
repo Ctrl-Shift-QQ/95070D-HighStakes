@@ -4,7 +4,7 @@
 
 class PID {
     public:
-        const double startError;
+        double startError;
 
         //Tunings
         const double kp;

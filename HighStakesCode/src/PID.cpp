@@ -35,10 +35,10 @@ double PID::output(double error){
 }
 
 bool PID::isSettled(double error){
-    if ((fabs(error) < deadband && timeSpent > settleTime) || timeSpent > timeout){
+    if ((fabs(error) < deadband && timeSpent > settleTime) || (timeSpent > timeout && timeout > 0)){
         return true;
     }
-
+    
     this->timeSpent += loopCycleTime;
 
     return false;

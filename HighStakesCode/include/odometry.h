@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mech-config.h"
 #include "util.h"
 
 class Odometry {

@@ -27,10 +27,9 @@ motor_group Intake(FirstIntake, SecondIntake);
 motor ArmMotor = motor(PORT8, ratio18_1, true);
 motor_group Arm(ArmMotor);
 rotation ArmRotation = rotation(PORT21, true);
-optical IntakeOptical = optical(PORT3);
 inertial Inertial = inertial(PORT7);
-rotation SidewaysTracker = rotation(PORT18, false);
-rotation ForwardTracker = rotation(PORT20, true);
+rotation SidewaysTracker = rotation(PORT18, true);
+// rotation ForwardTracker = rotation(PORT20, true);
 digital_out MogoMech = digital_out(Brain.ThreeWirePort.A);
 digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
 

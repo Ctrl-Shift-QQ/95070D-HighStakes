@@ -178,14 +178,13 @@ void runArm(){
     static int currentMacro = 0; //Used for indexing
     static double macroPositions[] = {0, ARM_LOADING_POSITION};
     static double targetPosition = 0;
+    static double output = 0;
     
-    static PID armPID(0, ARM_MACRO_KP, ARM_MACRO_KI, 0, ARM_MACRO_START_I, 0, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
+    static PID armPID(targetPosition, ARM_MACRO_KP, 0, 0, 0, ARM_MACRO_DEADBAND, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
 
     if (ARM_SPIN_BUTTON.pressing()){ //Manual
         motorHold(ARM_MANUAL_SPEED, Arm, ARM_SPIN_BUTTON, nullButton);
         motorHold(ARM_INTAKE_SPEED, Intake, nullButton, ARM_SPIN_BUTTON);
-
-        armPID.integral = 0;
     }
     else { //Macro
         if (pressed(ARM_TOGGLE_STATE_BUTTON_ID)){
@@ -195,10 +194,20 @@ void runArm(){
             else {
                 currentMacro++;
             }
+
+            targetPosition = macroPositions[currentMacro];
+            armPID.startError = targetPosition;
         }
         
-        targetPosition = macroPositions[currentMacro];
-        Arm.spin(forward, percentToVolts(armPID.output(targetPosition - ArmRotation.position(degrees))), volt);
+        if (!armPID.isSettled(targetPosition - ArmRotation.position(degrees))){
+            output = armPID.output(targetPosition - ArmRotation.position(degrees));
+            
+            if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
+                output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
+            }
+
+            Arm.spin(forward, percentToVolts(output), volt);
+        }
     }
 }
 
