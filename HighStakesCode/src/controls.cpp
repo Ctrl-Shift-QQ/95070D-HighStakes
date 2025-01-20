@@ -179,7 +179,7 @@ void runArm(){
     static double macroPositions[] = {0, ARM_LOADING_POSITION};
     static double targetPosition = 0;
     static double output = 0;
-    
+
     static PID armPID(targetPosition, ARM_MACRO_KP, 0, 0, 0, ARM_MACRO_DEADBAND, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
 
     if (ARM_SPIN_BUTTON.pressing()){ //Manual
@@ -199,14 +199,17 @@ void runArm(){
             armPID.startError = targetPosition;
         }
         
-        if (!armPID.isSettled(targetPosition - ArmRotation.position(degrees))){
-            output = armPID.output(targetPosition - ArmRotation.position(degrees));
-            
-            if (fabs(output) < ARM_MACRO_MINIMUM_SPEED){
-                output = ARM_MACRO_MINIMUM_SPEED * getSign(output);
-            }
+        if (ArmRotation.position(degrees) < 0){ //Sensor reset if value is negative
+            ArmRotation.setPosition(0, degrees);
+        }
+        
+        output = armPID.output(targetPosition - ArmRotation.position(degrees));
 
+        if (!armPID.isSettled(targetPosition - ArmRotation.position(degrees))){
             Arm.spin(forward, percentToVolts(output), volt);
+        }
+        else {
+            Arm.stop(brake);
         }
     }
 }

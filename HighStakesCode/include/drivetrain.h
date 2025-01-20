@@ -30,6 +30,7 @@ class Drivetrain {
         } outputConstants;
 
         outputConstants defaultDriveOutputConstants;
+        outputConstants defaultHeadingOutputConstants;
         outputConstants defaultDriveDistanceTurnOutputConstants;
         outputConstants defaultTurnOutputConstants;
         outputConstants defaultSwingOutputConstants;
@@ -40,6 +41,7 @@ class Drivetrain {
         } clampConstants;
 
         clampConstants defaultDriveClampConstants;
+        clampConstants defaultHeadingClampConstants;
         clampConstants defaultDriveDistanceTurnClampConstants;
         clampConstants defaultTurnClampConstants;
         clampConstants defaultSwingClampConstants;
@@ -52,9 +54,9 @@ class Drivetrain {
         } settleConstants;
         
         settleConstants defaultDriveSettleConstants;
+        settleConstants defaultHeadingSettleConstants;
         settleConstants defaultTurnSettleConstants;
         settleConstants defaultSwingSettleConstants;
-
 
         /******************** Motion algorithms ********************/
 
@@ -62,7 +64,7 @@ class Drivetrain {
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants);
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants);
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants);
-        void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, outputConstants turnOutputConstants);
+        void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, settleConstants turnSettleConstants, outputConstants turnOutputConstants);
 
         void driveDistance(double targetDistance);
         void driveDistance(double targetDistance, double targetHeading);

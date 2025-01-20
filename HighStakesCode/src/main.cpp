@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2.75, 3.25, 2.75, 7.75, 360/358.5); //Initializes chassis
+Drivetrain chassis(2.75, 3.25, 2.25, 6.5, 360/358.5); //Initializes chassis
 
 
 void preAuton(){
@@ -180,6 +180,7 @@ void autonomous(){
 
   switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
+      runProgSkills();
       break;
     }
     case AutonRedSoloAWP: {
@@ -246,9 +247,9 @@ void usercontrol(){
 int main(){
   Competition.drivercontrol(usercontrol);
   Competition.autonomous(autonomous);
-
+  
   preAuton();
-
+  
   while (true){
     wait(DEFAULT_LOOP_CYCLE_TIME, msec);
   }

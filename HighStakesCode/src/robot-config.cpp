@@ -13,25 +13,25 @@ brain  Brain;
 // VEXcode device constructors
 
 controller Controller1 = controller(primary);
-motor LeftFront = motor(PORT15, ratio6_1, true);
-motor LeftBack = motor(PORT11, ratio6_1, true);
-motor LeftStack = motor(PORT17, ratio6_1, true);
-motor RightFront = motor(PORT19, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor RightStack = motor(PORT9, ratio6_1, false);
+motor LeftFront = motor(PORT12, ratio6_1, true);
+motor LeftBack = motor(PORT9, ratio6_1, true);
+motor LeftStack = motor(PORT10, ratio6_1, true);
+motor RightFront = motor(PORT2, ratio6_1, false);
+motor RightBack = motor(PORT7, ratio6_1, false);
+motor RightStack = motor(PORT1, ratio6_1, false);
 motor_group LeftDrive(LeftFront, LeftBack, LeftStack);
 motor_group RightDrive(RightFront, RightBack, RightStack);
-motor FirstIntake = motor(PORT10, ratio18_1, true);
-motor SecondIntake = motor(PORT12, ratio6_1, false);
+motor FirstIntake = motor(PORT5, ratio18_1, true);
+motor SecondIntake = motor(PORT6, ratio6_1, false);
 motor_group Intake(FirstIntake, SecondIntake);
-motor ArmMotor = motor(PORT8, ratio18_1, true);
+motor ArmMotor = motor(PORT3, ratio18_1, true);
 motor_group Arm(ArmMotor);
 rotation ArmRotation = rotation(PORT21, true);
-inertial Inertial = inertial(PORT7);
-rotation SidewaysTracker = rotation(PORT18, true);
+inertial Inertial = inertial(PORT4);
+rotation SidewaysTracker = rotation(PORT11, true);
 // rotation ForwardTracker = rotation(PORT20, true);
-digital_out MogoMech = digital_out(Brain.ThreeWirePort.A);
-digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
+digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
+digital_out Doinker = digital_out(Brain.ThreeWirePort.G);
 
 
 // VEXcode generated functions

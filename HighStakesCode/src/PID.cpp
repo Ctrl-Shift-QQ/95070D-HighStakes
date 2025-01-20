@@ -31,7 +31,7 @@ double PID::output(double error){
     this->derivative = previousError - error;
     this->previousError = error;
     
-    return error * kp + integral / loopsPerSec * ki - derivative * loopsPerSec * kd;
+    return ((error * kp) + (integral / loopsPerSec * ki) - (derivative * loopsPerSec * kd));
 }
 
 bool PID::isSettled(double error){

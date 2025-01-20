@@ -26,26 +26,26 @@ void Drivetrain::setCoordinates(double startPositionX, double startPositionY, do
 /******************** Motion Algorithms ********************/
 
 void Drivetrain::driveToPoint(double targetX, double targetY){
-    driveToPoint(targetX, targetY, defaultDriveClampConstants, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultTurnClampConstants, defaultTurnOutputConstants); 
+    driveToPoint(targetX, targetY, defaultDriveClampConstants, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants); 
 }
 
 void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants){
-    driveToPoint(targetX, targetY, driveClampConstants, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultTurnClampConstants, defaultTurnOutputConstants); 
+    driveToPoint(targetX, targetY, driveClampConstants, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants); 
 }
 
 void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants){
-    driveToPoint(targetX, targetY, driveClampConstants, driveSettleConstants, defaultDriveOutputConstants, defaultTurnClampConstants, defaultTurnOutputConstants);
+    driveToPoint(targetX, targetY, driveClampConstants, driveSettleConstants, defaultDriveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants);
 }
 
 void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
-    driveToPoint(targetX, targetY, driveClampConstants, driveSettleConstants, driveOutputConstants, defaultTurnClampConstants, defaultTurnOutputConstants);
+    driveToPoint(targetX, targetY, driveClampConstants, driveSettleConstants, driveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants);
 }
 
-void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, outputConstants turnOutputConstants){
+void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, settleConstants turnSettleConstants, outputConstants turnOutputConstants){
     double driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
     double turnTarget = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 360, 360); //Heading that faces target
     double turnError = 0;
-    if (cos(degToRad(headingError(turnTarget, odom.orientation))) < 0){ //Reverses target heading if driving backwards
+    if (fabs(headingError(turnTarget, odom.orientation)) > 90){ //Reverses target heading if driving backwards
         turnError = headingError(fmod(turnTarget + 180, 360), odom.orientation);
     }
     else {
@@ -58,28 +58,27 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
     
     //Double PID (drives and turns toward the target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
+    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, turnSettleConstants.deadband, driveSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
         driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
         turnTarget = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 360, 360); //Heading that faces target
-        if (cos(degToRad(headingError(turnTarget, odom.orientation))) < 0){ //Reverses target heading if driving backwards
+        turnError = headingError(turnTarget, odom.orientation);
+
+        driveOutput = drivePID.output(driveError) * cos(degToRad(turnError));
+        if (fabs(headingError(turnTarget, odom.orientation)) > 90){ //Reverses target heading if driving backwards
             turnError = headingError(fmod(turnTarget + 180, 360), odom.orientation);
         }
-        else {
-            turnError = headingError(turnTarget, odom.orientation);
-        }
-
-        driveOutput = drivePID.output(driveError) * cos(degToRad(headingError(turnTarget, odom.orientation)));
         turnOutput = turnPID.output(turnError);
-        if (fabs(turnError) < fabs(radToDeg(atan2(driveSettleConstants.deadband, driveError)))){ //Prevents drastic turning when near the target, stops turning when facing point within deadband
+
+        if (fabs(driveError) < turnSettleConstants.deadband){ //Prevents drastic turning when near the target
             turnOutput = 0;
         }
-        
+
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
         driveOutput *= driveOutputScale(driveClampConstants.minimumSpeed, driveClampConstants.maximumSpeed, driveOutput, driveOutput);
         turnOutput *= driveOutputScale(turnClampConstants.minimumSpeed, turnClampConstants.maximumSpeed, turnOutput, turnOutput);
-
+    
         leftSideOutput = driveOutput + turnOutput;
         rightSideOutput = driveOutput - turnOutput;
 
@@ -175,7 +174,7 @@ void Drivetrain::turnToHeading(double targetHeading, clampConstants turnClampCon
 
         LeftDrive.spin(forward, percentToVolts(turnOutput), volt);
         RightDrive.spin(reverse, percentToVolts(turnOutput), volt);
-
+        std::cout << turnError << std::endl;
         wait(turnSettleConstants.loopCycleTime, msec);
     }
 }
@@ -221,7 +220,6 @@ void Drivetrain::swingToHeading(std::string driveSide, double targetHeading, cla
 
 void Drivetrain::swingToHeading(std::string driveSide, double targetHeading, clampConstants swingClampConstants, settleConstants swingSettleConstants, outputConstants swingOutputConstants){
     double swingError = headingError(targetHeading, odom.orientation);
-
     double swingOutput = 0;
 
     PID swingPID(swingError, swingOutputConstants.kp, swingOutputConstants.ki, swingOutputConstants.kd, swingOutputConstants.startI, swingSettleConstants.deadband, swingSettleConstants.loopCycleTime, swingSettleConstants.settleTime, swingSettleConstants.timeout);
@@ -232,7 +230,7 @@ void Drivetrain::swingToHeading(std::string driveSide, double targetHeading, cla
         swingOutput = swingPID.output(swingError);
 
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
-        swingOutput *= driveOutputScale(swingClampConstants.minimumSpeed, swingClampConstants.maximumSpeed, swingOutput, -swingOutput);
+        swingOutput *= driveOutputScale(swingClampConstants.minimumSpeed, swingClampConstants.maximumSpeed, swingOutput, swingOutput);
 
         if (driveSide == "Left"){
             LeftDrive.spin(forward, percentToVolts(swingOutput), volt);
