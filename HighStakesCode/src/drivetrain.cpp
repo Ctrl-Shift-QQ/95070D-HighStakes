@@ -174,7 +174,7 @@ void Drivetrain::turnToHeading(double targetHeading, clampConstants turnClampCon
 
         LeftDrive.spin(forward, percentToVolts(turnOutput), volt);
         RightDrive.spin(reverse, percentToVolts(turnOutput), volt);
-        std::cout << turnError << std::endl;
+        
         wait(turnSettleConstants.loopCycleTime, msec);
     }
 }
