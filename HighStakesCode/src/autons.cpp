@@ -120,7 +120,7 @@ int armToWallStake(){
 void runOdomTest(){
     Inertial.calibrate();
     wait(3, sec);
-    chassis.setCoordinates(0, 0, 0);
+    chassis.setCoordinates(-59.5, 0, 90);
 
     while (true){
         Controller1.Screen.clearScreen();
@@ -618,7 +618,7 @@ void runProgSkills(){
 
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
     wait(0.1, sec);
-    chassis.driveToPoint(-49, 0, shortDriveClamp, shortDriveSettle);
+    chassis.driveToPoint(-48, 0, shortDriveClamp, shortDriveSettle);
     Intake.stop(brake);
     chassis.turnToHeading(180);
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
@@ -648,7 +648,34 @@ void runProgSkills(){
     chassis.driveDistance(-5);
     MogoMech.set(true); //Mogo deposited in corner
 
-    chassis.driveToPoint(-48, 0);
+    Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveToPoint(-36, 0);
+
+    chassis.turnToHeading(0);
+    chassis.driveDistance(-32, 0);
+    MogoMech.set(false); //Mogo clamped
+
+    wait(500, msec);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.turnToHeading(90);
+    chassis.driveDistance(24); //One ring scored on mogo
+
+    chassis.turnToHeading(180);
+    chassis.driveDistance(25); //Two rings scored on mogo
+
+    chassis.turnToHeading(90);
+    chassis.driveDistance(48); //Three rings scored on mogo
+
+    chassis.turnToHeading(270);
+    chassis.driveDistance(48, 270);
+    chassis.driveDistance(34, 270); //Five rings scored on mogo
+
+    chassis.turnToHeading(135);
+    chassis.driveDistance(8); //Six rings scored on mogo
+
+    chassis.turnToHeading(70);
+    chassis.driveDistance(-5);
+    MogoMech.set(true); //Mogo deposited in corner
 
     Intake.stop(brake);
     chassis.stopDrive(brake);
