@@ -641,42 +641,43 @@ void runProgSkills(){
 
     chassis.stopDrive(brake);
     wait(300, msec);
-    chassis.turnToPoint(false, -52, 60);
+    chassis.turnToPoint(false, -48, 60);
     chassis.driveDistance(8); //Six rings scored on mogo
 
     chassis.turnToPoint(true, -72, 75);
-    chassis.driveDistance(-5);
+    chassis.driveDistance(-7);
     MogoMech.set(true); //Mogo deposited in corner
 
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
-    chassis.driveToPoint(-36, 0);
-
+    chassis.driveDistance(20);
     chassis.turnToHeading(0);
+
     chassis.driveDistance(-32, 0);
+    chassis.driveDistance(-40, 0);
     MogoMech.set(false); //Mogo clamped
 
-    wait(500, msec);
-    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
-    chassis.turnToHeading(90);
-    chassis.driveDistance(24); //One ring scored on mogo
+    // wait(500, msec);
+    // Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    // chassis.turnToHeading(90);
+    // chassis.driveDistance(24); //One ring scored on mogo
 
-    chassis.turnToHeading(180);
-    chassis.driveDistance(25); //Two rings scored on mogo
+    // chassis.turnToHeading(180);
+    // chassis.driveDistance(22); //Two rings scored on mogo
 
-    chassis.turnToHeading(90);
-    chassis.driveDistance(48); //Three rings scored on mogo
+    // chassis.turnToHeading(90);
+    // chassis.driveDistance(48); //Three rings scored on mogo
 
-    chassis.turnToHeading(270);
-    chassis.driveDistance(48, 270);
-    chassis.driveDistance(34, 270); //Five rings scored on mogo
+    // chassis.turnToHeading(270);
+    // chassis.driveDistance(48, 270);
+    // chassis.driveDistance(34, 270); //Five rings scored on mogo
 
-    chassis.turnToHeading(135);
-    chassis.driveDistance(8); //Six rings scored on mogo
+    // chassis.turnToHeading(135);
+    // chassis.driveDistance(8); //Six rings scored on mogo
 
-    chassis.turnToHeading(70);
-    chassis.driveDistance(-5);
-    MogoMech.set(true); //Mogo deposited in corner
+    // chassis.turnToHeading(70);
+    // chassis.driveDistance(-5);
+    // MogoMech.set(true); //Mogo deposited in corner
 
-    Intake.stop(brake);
-    chassis.stopDrive(brake);
+    // Intake.stop(brake);
+    // chassis.stopDrive(brake);
 }
