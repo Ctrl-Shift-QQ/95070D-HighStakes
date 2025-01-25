@@ -20,7 +20,7 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     this->previousOrientationRad = degToRad(orientation);
 
     //Sets sensor values accordingly
-    Inertial.setRotation(orientation, degrees);
+    Inertial.setRotation(orientation / inertialScale, degrees);
     SidewaysTracker.resetPosition();
     RightDrive.resetPosition();
 }
@@ -29,7 +29,7 @@ void Odometry::updatePosition(){
     //Saves values so that they don't change during the same cycle
     double sidewaysTrackerPosition = SidewaysTracker.position(turns);
     double forwardTrackerPosition = RightDrive.position(turns) * DRIVETRAIN_GEAR_RATIO;
-    double orientationRad = degToRad(fmod(fmod(Inertial.rotation(degrees) * inertialScale, 360) + 360, 360));
+    double orientationRad = degToRad(Inertial.rotation(degrees) * inertialScale);
     double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * sidewaysWheelDiameter * M_PI; //Gets change in inches
     double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * forwardWheelDiameter * M_PI; //Gets change in inches
     double orientationDeltaRad = orientationRad - previousOrientationRad;
@@ -63,7 +63,7 @@ void Odometry::updatePosition(){
     //Applies offset to get updated values
     this->xPosition += xPositionDelta;
     this->yPosition += yPositionDelta;
-    this->orientation = radToDeg(orientationRad);
+    this->orientation = fmod(fmod(radToDeg(orientationRad), 360) + 360, 360);
 
     //Sets previous values of next cycle to current values
     this->previousSidewaysPosition = sidewaysTrackerPosition;

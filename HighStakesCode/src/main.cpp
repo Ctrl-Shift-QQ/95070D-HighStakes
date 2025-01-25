@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2.75, 3.25, 2.25, 6.5, 360/358.5); //Initializes chassis
+Drivetrain chassis(2.75, 3.25, 4.25, 6.5, 360/358.5); //Initializes chassis
 
 
 void preAuton(){
@@ -231,7 +231,7 @@ void usercontrol(){
       runArcadeDrive(100, 100);
 
       runIntake();
-    
+
       runArm();
 
       runMogo();
@@ -247,7 +247,7 @@ void usercontrol(){
 int main(){
   Competition.drivercontrol(usercontrol);
   Competition.autonomous(autonomous);
-  
+
   preAuton();
   
   while (true){

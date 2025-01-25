@@ -78,7 +78,7 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
         driveOutput *= driveOutputScale(driveClampConstants.minimumSpeed, driveClampConstants.maximumSpeed, driveOutput, driveOutput);
         turnOutput *= driveOutputScale(turnClampConstants.minimumSpeed, turnClampConstants.maximumSpeed, turnOutput, turnOutput);
-    
+
         leftSideOutput = driveOutput + turnOutput;
         rightSideOutput = driveOutput - turnOutput;
 
