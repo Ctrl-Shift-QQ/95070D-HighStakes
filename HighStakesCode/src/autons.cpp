@@ -713,6 +713,7 @@ void runProgSkills(){
 
     chassis.defaultDriveClampConstants.maximumSpeed = 60;
     chassis.defaultDriveSettleConstants.deadband = 1;
+    chassis.defaultDriveSettleConstants.timeout = 5000;
 
     chassis.defaultTurnSettleConstants.deadband = 1.5;
     chassis.defaultTurnSettleConstants.settleTime = 750;
@@ -827,15 +828,17 @@ void runProgSkills(){
     chassis.turnToHeading(0);
     chassis.turnToHeading(0);
     Intake.stop(brake);
+    FirstIntake.spin(forward, 50, percent);
     chassis.driveDistance(24);
 
+    Intake.stop(brake);
     chassis.turnToHeading(225);
     chassis.driveDistance(-32, 225, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(false); //Mogo clamped
 
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent); //One ring scored on mogo
     chassis.turnToHeading(0);
-    chassis.driveDistance(60); //Three rings scored on mogo
+    chassis.driveDistance(58, 0, shortDriveClamp); //Three rings scored on mogo
 
     chassis.turnToHeading(240);
     chassis.driveDistance(-8);
@@ -845,7 +848,7 @@ void runProgSkills(){
 
     chassis.driveDistance(20);
     chassis.turnToHeading(160);
-    chassis.driveDistance(48);
+    chassis.driveDistance(60);
     chassis.turnToHeading(180);
     chassis.driveDistance(80); //Mogo pushed into corner
 
