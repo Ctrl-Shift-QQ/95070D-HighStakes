@@ -9,6 +9,7 @@ Drivetrain::Drivetrain(double sidewaysWheelDiameter, double forwardWheelDiameter
 /******************** Odometry ********************/
 
 int Drivetrain::trackPosition(){
+    int i = 0;
     while (true){
         chassis.odom.updatePosition();
 

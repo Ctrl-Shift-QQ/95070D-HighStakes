@@ -43,7 +43,7 @@ void setDefaultPIDConstants(){
     chassis.defaultTurnClampConstants.maximumSpeed = 100;
     chassis.defaultTurnSettleConstants.deadband = 2;
     chassis.defaultTurnSettleConstants.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
-    chassis.defaultTurnSettleConstants.settleTime = 600;
+    chassis.defaultTurnSettleConstants.settleTime = 700;
     chassis.defaultTurnSettleConstants.timeout = 1000;
 
     //Swing Constants
@@ -120,7 +120,7 @@ int armToWallStake(){
 void runOdomTest(){
     Inertial.calibrate();
     wait(3, sec);
-    chassis.setCoordinates(-59.5, 0, 90);
+    chassis.setCoordinates(0, 0, 0);
 
     while (true){
         Controller1.Screen.clearScreen();
@@ -245,39 +245,33 @@ void runAutonRedSoloAWP(){
     task resetArm = task(armToDown);
     MogoMech.set(false); //Mogo clamped
 
-    // wait(300, msec);
-    // chassis.stopDrive(brake);
-    // chassis.turnToPoint(false, -3, 43);
-    // chassis.turnToPoint(false, -3, 43);
-    // Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
-    // chassis.driveToPoint(-2, 46);
-    // chassis.turnToHeading(0, chassis.defaultTurnClampConstants, shortTurnSettle);
-    // chassis.driveDistance(16, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
-
-    // chassis.driveToPoint(-18, 40, shortDriveClamp, shortDriveSettle);
-    // chassis.turnToPoint(false, -24, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
-    // chassis.turnToPoint(false, -24, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
-    // chassis.driveDistance(20); //Three rings scored on mogo
- 
-    // chassis.turnToPoint(false, -48, -4, chassis.defaultTurnClampConstants, shortTurnSettle, noMogoTurnOutput);
-    // Intake.stop(brake);
-    // MogoMech.set(true);
-    // chassis.driveToPoint(-48, -4, longDriveDriveClamp);
-    // chassis.turnToPoint(true, -28, -40);
-    // Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
-    // chassis.driveToPoint(-28, -40, clampMogoDriveClamp, clampMogoDriveSettle);
-    // MogoMech.set(false); //Mogo Clamped
-    
-    // chassis.stopDrive(brake);
-    // wait(300, msec);
-    // chassis.turnToHeading(180);
-    // chassis.driveDistance(18, 180); //One ring scored on mogo
-
-    // chassis.turnToHeading(0);
-    // chassis.driveDistance(38, 0); 
+    wait(300, msec);
     chassis.stopDrive(brake);
+    chassis.turnToPoint(false, -3, 43);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveToPoint(-2, 46);
+    chassis.turnToHeading(0, chassis.defaultTurnClampConstants, shortTurnSettle);
+    chassis.driveDistance(16, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
-    std::cout << "Final Coords: " << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
+    chassis.driveToPoint(-10, 36, shortDriveClamp, shortDriveSettle);
+    chassis.turnToHeading(345);
+    chassis.driveDistance(20); //Three rings scored on mogo
+ 
+    chassis.turnToHeading(210);
+    MogoMech.set(true);
+    Intake.stop(brake);
+    chassis.driveDistance(50);
+    chassis.turnToHeading(310);
+    chassis.driveDistance(-36, 310, clampMogoDriveClamp, clampMogoDriveSettle);
+    MogoMech.set(false); //Mogo clamped
+
+    chassis.stopDrive(brake);
+    wait(300, msec);
+    chassis.turnToHeading(180);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveDistance(22);
+    chassis.turnToHeading(0);
+    chassis.driveDistance(48); //Ladder touched
 }
 
 void runAutonRedRushAWP(){
@@ -331,15 +325,14 @@ void runAutonRedRushAWP(){
     noMogoTurnOutput.ki = 30;
     noMogoTurnOutput.kd = 0.125;
     noMogoTurnOutput.startI = 10;
-
-    wait(5000, msec);
+    std::cout << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
     task loadForAlly = task(armToLoad);
-    chassis.driveToPoint(-57.5, -7, shortDriveClamp, shortDriveSettle);
+    chassis.driveToPoint(-57.5, -8, shortDriveClamp, shortDriveSettle);
     Intake.stop(brake);
     loadForAlly.stop();
     task scoreOnAlly = task(armToAllianceStake);
-    chassis.turnToPoint(false, -71, 2, chassis.defaultTurnClampConstants, allyStakeTurnSettle, noMogoTurnOutput); //One ring scored on ally stake;
+    chassis.turnToPoint(false, -71, -3, chassis.defaultTurnClampConstants, allyStakeTurnSettle, noMogoTurnOutput); //One ring scored on ally stake;
 
     scoreOnAlly.stop();
     MogoMech.set(true);
@@ -347,17 +340,97 @@ void runAutonRedRushAWP(){
     task resetArm = task(armToDown);
     MogoMech.set(false); //Mogo clamped
 
-    chassis.turnToPoint(false, -28, -48);
-    chassis.driveToPoint(-28, -48); //One ring scored on mogo
-
-    chassis.turnToPoint(false, -24, -0);
-    chassis.driveToPoint(-24, -5); //Ladder touched
+    chassis.stopDrive(brake);
+    wait(300, msec);
+    chassis.turnToHeading(180);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveDistance(22);
+    chassis.turnToHeading(0);
+    chassis.driveDistance(40, 0, shortDriveClamp); //Ladder Touched
 }
 
 void runAutonRedStackAWP(){
-    chassis.setCoordinates(0, 0, 180);
+    chassis.setCoordinates(-57.5, 17, 180);
     setDefaultPIDConstants();
 
+    Drivetrain::clampConstants shortDriveClamp;
+    shortDriveClamp.minimumSpeed = 0;
+    shortDriveClamp.maximumSpeed = 60;
+
+    Drivetrain::clampConstants clampMogoDriveClamp;
+    clampMogoDriveClamp.minimumSpeed = 0;
+    clampMogoDriveClamp.maximumSpeed = 50;
+
+    Drivetrain::clampConstants longDriveDriveClamp;
+    longDriveDriveClamp.minimumSpeed = 0;
+    longDriveDriveClamp.maximumSpeed = 70;
+
+    Drivetrain::settleConstants shortDriveSettle;
+    shortDriveSettle.deadband = 1;
+    shortDriveSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    shortDriveSettle.settleTime = 400;
+    shortDriveSettle.timeout = 1250;
+
+    Drivetrain::settleConstants shortTurnSettle;
+    shortTurnSettle.deadband = 2;
+    shortTurnSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    shortTurnSettle.settleTime = 500;
+    shortTurnSettle.timeout = 1250;
+
+    Drivetrain::settleConstants allyStakeTurnSettle;
+    allyStakeTurnSettle.deadband = 2;
+    allyStakeTurnSettle.loopCycleTime = 20;
+    allyStakeTurnSettle.settleTime = 1500;
+    allyStakeTurnSettle.timeout = 2000;
+
+    Drivetrain::settleConstants noMogoTurnSettle;
+    noMogoTurnSettle.deadband = 2;
+    noMogoTurnSettle.loopCycleTime = 20;
+    noMogoTurnSettle.settleTime = 750;
+    noMogoTurnSettle.timeout = 2000;
+
+    Drivetrain::settleConstants clampMogoDriveSettle;
+    clampMogoDriveSettle.deadband = 2;
+    clampMogoDriveSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    clampMogoDriveSettle.settleTime = 1000;
+    clampMogoDriveSettle.timeout = 1500;
+
+    Drivetrain::outputConstants noMogoTurnOutput;
+    noMogoTurnOutput.kp = 2;
+    noMogoTurnOutput.ki = 30;
+    noMogoTurnOutput.kd = 0.125;
+    noMogoTurnOutput.startI = 10;
+
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    task loadForAlly = task(armToLoad);
+    chassis.driveToPoint(-57.5, 8, shortDriveClamp, shortDriveSettle);
+    Intake.stop(brake);
+    loadForAlly.stop();
+    task scoreOnAlly = task(armToAllianceStake);
+    chassis.turnToPoint(false, -71, 2, chassis.defaultTurnClampConstants, allyStakeTurnSettle, noMogoTurnOutput); //One ring scored on ally stake;
+
+    scoreOnAlly.stop();
+    MogoMech.set(true);
+    chassis.driveToPoint(-22, 24, clampMogoDriveClamp, clampMogoDriveSettle);
+    task resetArm = task(armToDown);
+    MogoMech.set(false); //Mogo clamped
+
+    wait(300, msec);
+    chassis.stopDrive(brake);
+    chassis.turnToPoint(false, -3, 43);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveToPoint(-2, 46);
+    chassis.turnToHeading(0, chassis.defaultTurnClampConstants, shortTurnSettle);
+    chassis.driveDistance(16, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
+
+    chassis.driveToPoint(-10, 36, shortDriveClamp, shortDriveSettle);
+    chassis.turnToHeading(345);
+    chassis.driveDistance(20); 
+    chassis.stopDrive(brake);
+    wait(300, msec); //Three rings scored on mogo
+
+    chassis.turnToHeading(180);
+    chassis.driveDistance(44, 180, shortDriveClamp); //Ladder touched
 }
 
 void runAutonRedGoalRush(){
@@ -417,7 +490,7 @@ void runAutonBlueSoloAWP(){
     noMogoTurnOutput.ki = 30;
     noMogoTurnOutput.kd = 0.125;
     noMogoTurnOutput.startI = 10;
-    std::cout << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
+
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
     task loadForAlly = task(armToLoad);
     chassis.driveToPoint(57.5, 8, shortDriveClamp, shortDriveSettle);
@@ -441,8 +514,8 @@ void runAutonBlueSoloAWP(){
     chassis.driveDistance(14, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
     chassis.driveToPoint(18, 30, shortDriveClamp, shortDriveSettle);
-    chassis.turnToPoint(false, 24, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
-    chassis.driveToPoint(27, 46); //Three rings scored on mogo
+    chassis.turnToPoint(false, 26, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
+    chassis.driveDistance(20); //Three rings scored on mogo
  
     chassis.turnToPoint(false, 48, -4, chassis.defaultTurnClampConstants, shortTurnSettle, noMogoTurnOutput);
     Intake.stop(brake);
@@ -461,14 +534,81 @@ void runAutonBlueSoloAWP(){
     chassis.turnToHeading(0);
     chassis.driveDistance(38, 0); 
     chassis.stopDrive(brake); //Ladder touched
-
-    std::cout << "Final Coords: " << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
 }
 
 void runAutonBlueRushAWP(){
-    chassis.setCoordinates(55.25, -24, 90);
+    chassis.setCoordinates(57.5, -17, 0);
     setDefaultPIDConstants();
 
+    Drivetrain::clampConstants shortDriveClamp;
+    shortDriveClamp.minimumSpeed = 0;
+    shortDriveClamp.maximumSpeed = 60;
+
+    Drivetrain::clampConstants clampMogoDriveClamp;
+    clampMogoDriveClamp.minimumSpeed = 0;
+    clampMogoDriveClamp.maximumSpeed = 50;
+
+    Drivetrain::clampConstants longDriveDriveClamp;
+    longDriveDriveClamp.minimumSpeed = 0;
+    longDriveDriveClamp.maximumSpeed = 70;
+
+    Drivetrain::settleConstants shortDriveSettle;
+    shortDriveSettle.deadband = 1;
+    shortDriveSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    shortDriveSettle.settleTime = 400;
+    shortDriveSettle.timeout = 1250;
+
+    Drivetrain::settleConstants shortTurnSettle;
+    shortTurnSettle.deadband = 2;
+    shortTurnSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    shortTurnSettle.settleTime = 500;
+    shortTurnSettle.timeout = 1250;
+
+    Drivetrain::settleConstants allyStakeTurnSettle;
+    allyStakeTurnSettle.deadband = 2;
+    allyStakeTurnSettle.loopCycleTime = 20;
+    allyStakeTurnSettle.settleTime = 1500;
+    allyStakeTurnSettle.timeout = 2000;
+
+    Drivetrain::settleConstants noMogoTurnSettle;
+    noMogoTurnSettle.deadband = 2;
+    noMogoTurnSettle.loopCycleTime = 20;
+    noMogoTurnSettle.settleTime = 750;
+    noMogoTurnSettle.timeout = 2000;
+
+    Drivetrain::settleConstants clampMogoDriveSettle;
+    clampMogoDriveSettle.deadband = 2;
+    clampMogoDriveSettle.loopCycleTime = DEFAULT_LOOP_CYCLE_TIME;
+    clampMogoDriveSettle.settleTime = 1000;
+    clampMogoDriveSettle.timeout = 1500;
+
+    Drivetrain::outputConstants noMogoTurnOutput;
+    noMogoTurnOutput.kp = 2;
+    noMogoTurnOutput.ki = 30;
+    noMogoTurnOutput.kd = 0.125;
+    noMogoTurnOutput.startI = 10;
+
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    task loadForAlly = task(armToLoad);
+    chassis.driveToPoint(57.5, -8, shortDriveClamp, shortDriveSettle);
+    Intake.stop(brake);
+    loadForAlly.stop();
+    task scoreOnAlly = task(armToAllianceStake);
+    chassis.turnToPoint(false, 71, -2, chassis.defaultTurnClampConstants, allyStakeTurnSettle, noMogoTurnOutput); //One ring scored on ally stake;
+
+    scoreOnAlly.stop();
+    MogoMech.set(true);
+    chassis.driveToPoint(22, -24, clampMogoDriveClamp, clampMogoDriveSettle);
+    task resetArm = task(armToDown);
+    MogoMech.set(false); //Mogo clamped
+
+    wait(300, msec);
+    chassis.stopDrive(brake);
+    chassis.turnToHeading(180);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.driveDistance(22);
+    chassis.turnToHeading(0);
+    chassis.driveDistance(40, 0, shortDriveClamp); //Ladder touched
 }
 
 void runAutonBlueStackAWP(){
@@ -549,20 +689,14 @@ void runAutonBlueStackAWP(){
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
     chassis.driveToPoint(11, 35, shortDriveClamp);
     chassis.turnToHeading(0, chassis.defaultTurnClampConstants, shortTurnSettle);
-    chassis.driveDistance(16, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
+    chassis.driveDistance(17, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
     chassis.driveToPoint(18, 30, shortDriveClamp, shortDriveSettle);
-    chassis.turnToPoint(false, 24, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
-    chassis.driveToPoint(27, 46); //Three rings scored on mogo
+    chassis.turnToPoint(false, 26, 48, chassis.defaultTurnClampConstants, shortTurnSettle);
+    chassis.driveDistance(20); //Three rings scored on mogo
 
     chassis.turnToPoint(false, 28, 0);
-    chassis.turnToPoint(false, 28, 0);
-    chassis.driveDistance(42, chassis.odom.orientation, chassis.defaultDriveClampConstants, touchLadderDriveSettle);
-    
-    
-    chassis.stopDrive(brake); //Ladder touched
-
-    std::cout << "Final Coords: " << chassis.odom.xPosition << " " << chassis.odom.yPosition << std::endl;
+    chassis.driveDistance(40, chassis.odom.orientation, shortDriveClamp, touchLadderDriveSettle); //Ladder touched
 }
 
 void runAutonBlueGoalRush(){
@@ -618,7 +752,7 @@ void runProgSkills(){
 
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
     wait(0.1, sec);
-    chassis.driveToPoint(-48, 0, shortDriveClamp, shortDriveSettle);
+    chassis.driveToPoint(-47, 0, shortDriveClamp, shortDriveSettle);
     Intake.stop(brake);
     chassis.turnToHeading(180);
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
@@ -641,43 +775,80 @@ void runProgSkills(){
 
     chassis.stopDrive(brake);
     wait(300, msec);
-    chassis.turnToPoint(false, -48, 60);
-    chassis.driveDistance(8); //Six rings scored on mogo
+    chassis.turnToHeading(45);
+    chassis.driveDistance(6); 
+    wait(500, msec);
+    chassis.stopDrive(brake); //Six rings scored on mogo
 
     chassis.turnToPoint(true, -72, 75);
     chassis.driveDistance(-7);
     MogoMech.set(true); //Mogo deposited in corner
 
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
-    chassis.driveDistance(20);
+    chassis.stopDrive(brake);
+    wait(2000, msec);
+    chassis.driveDistance(10);
     chassis.turnToHeading(0);
 
     chassis.driveDistance(-32, 0);
-    chassis.driveDistance(-40, 0);
+    chassis.driveDistance(-44, 0, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(false); //Mogo clamped
 
-    // wait(500, msec);
-    // Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
-    // chassis.turnToHeading(90);
-    // chassis.driveDistance(24); //One ring scored on mogo
+    wait(500, msec);
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
+    chassis.turnToHeading(90);
+    chassis.driveDistance(24); //One ring scored on mogo
 
-    // chassis.turnToHeading(180);
-    // chassis.driveDistance(22); //Two rings scored on mogo
+    chassis.turnToHeading(180);
+    chassis.driveDistance(24); //Two rings scored on mogo
 
-    // chassis.turnToHeading(90);
-    // chassis.driveDistance(48); //Three rings scored on mogo
+    chassis.turnToHeading(90);
+    chassis.driveDistance(46); //Three rings scored on mogo
 
-    // chassis.turnToHeading(270);
-    // chassis.driveDistance(48, 270);
-    // chassis.driveDistance(34, 270); //Five rings scored on mogo
+    chassis.turnToHeading(270);
+    chassis.driveDistance(46, 270, slowDriveClamp);
+    chassis.driveDistance(38, 270, slowDriveClamp); //Five rings scored on mogo
 
-    // chassis.turnToHeading(135);
-    // chassis.driveDistance(8); //Six rings scored on mogo
+    chassis.turnToHeading(135);
+    chassis.driveDistance(8); 
+    wait(500, msec); 
+    chassis.stopDrive(brake); //Six rings scored on mogo
 
-    // chassis.turnToHeading(70);
-    // chassis.driveDistance(-5);
-    // MogoMech.set(true); //Mogo deposited in corner
+    chassis.turnToHeading(50);
+    chassis.driveDistance(-10);
+    MogoMech.set(true); //Mogo deposited in corner
 
-    // Intake.stop(brake);
-    // chassis.stopDrive(brake);
+    Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
+    chassis.stopDrive(brake);
+    wait(2000, msec);
+
+    chassis.turnToHeading(80);
+    chassis.driveDistance(78);
+    chassis.turnToHeading(0);
+    chassis.turnToHeading(0);
+    Intake.stop(brake);
+    chassis.driveDistance(24);
+
+    chassis.turnToHeading(225);
+    chassis.driveDistance(-32, 225, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
+    MogoMech.set(false); //Mogo clamped
+
+    Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent); //One ring scored on mogo
+    chassis.turnToHeading(0);
+    chassis.driveDistance(60); //Three rings scored on mogo
+
+    chassis.turnToHeading(240);
+    chassis.driveDistance(-8);
+    MogoMech.set(true);
+    chassis.stopDrive(brake);
+    wait(500, msec); //Mogo deposited in corner
+
+    chassis.driveDistance(20);
+    chassis.turnToHeading(160);
+    chassis.driveDistance(48);
+    chassis.turnToHeading(180);
+    chassis.driveDistance(80); //Mogo pushed into corner
+
+    Intake.stop(brake);
+    chassis.stopDrive(brake);
 }

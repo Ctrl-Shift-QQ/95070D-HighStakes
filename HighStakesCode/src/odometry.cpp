@@ -64,7 +64,7 @@ void Odometry::updatePosition(){
     this->xPosition += xPositionDelta;
     this->yPosition += yPositionDelta;
     this->orientation = fmod(fmod(radToDeg(orientationRad), 360) + 360, 360);
-
+    
     //Sets previous values of next cycle to current values
     this->previousSidewaysPosition = sidewaysTrackerPosition;
     this->previousForwardPosition = forwardTrackerPosition;

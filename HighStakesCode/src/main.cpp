@@ -33,7 +33,7 @@ typedef enum { //Enum for each of the autons
 } Auton;
 static Auton currentAuton = AutonNone; //Initializes currentAuton
 
-Drivetrain chassis(2.75, 3.25, 4.25, 6.5, 360/358.5); //Initializes chassis
+Drivetrain chassis(2.75, 3.25, 2.25, 6.5, 360/358.5); //Initializes chassis
 
 
 void preAuton(){
@@ -180,7 +180,6 @@ void autonomous(){
 
   switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
-      runProgSkills();
       break;
     }
     case AutonRedSoloAWP: {
