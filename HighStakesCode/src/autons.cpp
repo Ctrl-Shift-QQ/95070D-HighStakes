@@ -782,13 +782,13 @@ void runProgSkills(){
     chassis.stopDrive(brake); //Six rings scored on mogo
 
     chassis.turnToPoint(true, -72, 75);
-    chassis.driveDistance(-7);
+    chassis.driveDistance(-8);
     MogoMech.set(true); //Mogo deposited in corner
 
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
     chassis.stopDrive(brake);
     wait(2000, msec);
-    chassis.driveDistance(10);
+    chassis.driveDistance(11);
     chassis.turnToHeading(0);
 
     chassis.driveDistance(-32, 0);
@@ -798,10 +798,10 @@ void runProgSkills(){
     wait(500, msec);
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent);
     chassis.turnToHeading(90);
-    chassis.driveDistance(24); //One ring scored on mogo
+    chassis.driveDistance(22); //One ring scored on mogo
 
     chassis.turnToHeading(180);
-    chassis.driveDistance(24); //Two rings scored on mogo
+    chassis.driveDistance(23); //Two rings scored on mogo
 
     chassis.turnToHeading(90);
     chassis.driveDistance(46); //Three rings scored on mogo
@@ -816,29 +816,30 @@ void runProgSkills(){
     chassis.stopDrive(brake); //Six rings scored on mogo
 
     chassis.turnToHeading(50);
-    chassis.driveDistance(-10);
-    MogoMech.set(true); //Mogo deposited in corner
-
+    chassis.driveDistance(-8);
+    MogoMech.set(true);
     Intake.spin(reverse, INTAKE_DEFAULT_SPEED, percent);
     chassis.stopDrive(brake);
-    wait(2000, msec);
+    wait(2000, msec); //Mogo deposited in corner
 
     chassis.turnToHeading(80);
     chassis.driveDistance(78);
     chassis.turnToHeading(0);
     chassis.turnToHeading(0);
     Intake.stop(brake);
-    FirstIntake.spin(forward, 50, percent);
-    chassis.driveDistance(24);
-
+    FirstIntake.spin(forward, 75, percent);
+    chassis.driveDistance(25);
     Intake.stop(brake);
     chassis.turnToHeading(225);
     chassis.driveDistance(-32, 225, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(false); //Mogo clamped
 
+    chassis.stopDrive(brake);
+    wait(300, msec);
     Intake.spin(forward, INTAKE_DEFAULT_SPEED, percent); //One ring scored on mogo
     chassis.turnToHeading(0);
-    chassis.driveDistance(58, 0, shortDriveClamp); //Three rings scored on mogo
+    chassis.driveDistance(48, 0, shortDriveClamp); 
+    chassis.driveDistance(4, 0, shortDriveClamp); //Three rings scored on mogo
 
     chassis.turnToHeading(240);
     chassis.driveDistance(-8);
@@ -848,9 +849,9 @@ void runProgSkills(){
 
     chassis.driveDistance(20);
     chassis.turnToHeading(160);
-    chassis.driveDistance(60);
+    chassis.driveDistance(70);
     chassis.turnToHeading(180);
-    chassis.driveDistance(80); //Mogo pushed into corner
+    chassis.driveDistance(48); //Mogo pushed into corner
 
     Intake.stop(brake);
     chassis.stopDrive(brake);
