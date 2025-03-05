@@ -2,11 +2,11 @@
 #include "odometry.h"
 #include <iostream>
 
-Odometry::Odometry(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale) :
-    sidewaysWheelDiameter(sidewaysWheelDiameter),
-    forwardWheelDiameter(forwardWheelDiameter),
-    sidewaysToCenterDistance(sidewaysToCenterDistance),
-    forwardToCenterDistance(forwardToCenterDistance),
+Odometry::Odometry(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale) :
+    horizontalWheelDiameter(horizontalWheelDiameter),
+    verticalWheelDiameter(verticalWheelDiameter),
+    horizontalToCenterDistance(horizontalToCenterDistance),
+    verticalToCenterDistance(verticalToCenterDistance),
     inertialScale(inertialScale)
 {};
 
@@ -15,23 +15,24 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     this->xPosition = xPosition;
     this->yPosition = yPosition;
     this->orientation = orientation;
-    this->previousSidewaysPosition = 0;
-    this->previousForwardPosition = 0;
+    this->previousHorizontalPosition = 0;
+    this->previousVerticalPosition = 0;
     this->previousOrientationRad = degToRad(orientation);
 
     //Sets sensor values accordingly
-    Inertial.setRotation(orientation / inertialScale, degrees);
-    SidewaysTracker.resetPosition();
-    RightDrive.resetPosition();
+    Inertial.setRotation(orientation / (360 / inertialScale), degrees);
+    HorizontalTracker.resetPosition();
+    RightFront.resetPosition();
 }
 
 void Odometry::updatePosition(){
     //Saves values so that they don't change during the same cycle
-    double sidewaysTrackerPosition = SidewaysTracker.position(turns);
-    double forwardTrackerPosition = RightDrive.position(turns) * DRIVETRAIN_GEAR_RATIO;
-    double orientationRad = degToRad(Inertial.rotation(degrees) * inertialScale);
-    double sidewaysPositionDelta = (sidewaysTrackerPosition - previousSidewaysPosition) * sidewaysWheelDiameter * M_PI; //Gets change in inches
-    double forwardPositionDelta = (forwardTrackerPosition - previousForwardPosition) * forwardWheelDiameter * M_PI; //Gets change in inches
+    double horizontalTrackerPosition = HorizontalTracker.position(turns);
+    double verticalTrackerPosition = RightFront.position(turns) * DRIVETRAIN_GEAR_RATIO;
+    this->orientation = fmod(fmod(Inertial.rotation(degrees) * (360 / inertialScale), 360) + 360, 360);
+    double orientationRad = degToRad(orientation);
+    double horizontalPositionDelta = (horizontalTrackerPosition - previousHorizontalPosition) * M_PI * horizontalWheelDiameter; //Gets change in inches
+    double verticalPositionDelta = (verticalTrackerPosition - previousVerticalPosition) * M_PI * verticalWheelDiameter ; //Gets change in inches
     double orientationDeltaRad = orientationRad - previousOrientationRad;
     double localXPosition;
     double localYPosition;
@@ -43,12 +44,12 @@ void Odometry::updatePosition(){
 
     //Gets local Cartesian translation coordinates of new position
     if (orientationDeltaRad == 0){
-        localXPosition = sidewaysPositionDelta;
-        localYPosition = forwardPositionDelta;
+        localXPosition = horizontalPositionDelta;
+        localYPosition = verticalPositionDelta;
     }
     else {
-        localXPosition = 2 * (sidewaysPositionDelta / orientationDeltaRad + sidewaysToCenterDistance) * sin(orientationDeltaRad / 2);
-        localYPosition = 2 * (forwardPositionDelta / orientationDeltaRad + forwardToCenterDistance) * sin(orientationDeltaRad / 2);
+        localXPosition = 2 * (horizontalPositionDelta / orientationDeltaRad + horizontalToCenterDistance) * sin(orientationDeltaRad / 2);
+        localYPosition = 2 * (verticalPositionDelta / orientationDeltaRad + verticalToCenterDistance) * sin(orientationDeltaRad / 2);
     }
 
     //Converts Cartesian translation coordinates to polar and local to global
@@ -63,10 +64,9 @@ void Odometry::updatePosition(){
     //Applies offset to get updated values
     this->xPosition += xPositionDelta;
     this->yPosition += yPositionDelta;
-    this->orientation = fmod(fmod(radToDeg(orientationRad), 360) + 360, 360);
     
     //Sets previous values of next cycle to current values
-    this->previousSidewaysPosition = sidewaysTrackerPosition;
-    this->previousForwardPosition = forwardTrackerPosition;
+    this->previousHorizontalPosition = horizontalTrackerPosition;
+    this->previousVerticalPosition = verticalTrackerPosition;
     this->previousOrientationRad = orientationRad;
 }

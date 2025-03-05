@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "autons.h"
+#include "match-config.h"
 #include "mech-config.h"
 #include "controls.h"
 #include <iostream>
@@ -17,23 +18,23 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
-static bool runningPreAuton = true; //Prevents driver control from running during pre-auton
 
-typedef enum { //Enum for each of the autons
-  AutonNone = 0,
-  AutonRedSoloAWP,
-  AutonRedRushAWP,
-  AutonRedStackAWP,
-  AutonRedGoalRush,
-  AutonBlueSoloAWP,
-  AutonBlueRushAWP,
-  AutonBlueStackAWP,
-  AutonBlueGoalRush,
-  AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
-} Auton;
-static Auton currentAuton = AutonNone; //Initializes currentAuton
+Drivetrain chassis(
+//Horizontal wheel diameter
+DRIVETRAIN_HORIZONTAL_WHEEL_DIAMETER,
 
-Drivetrain chassis(2.75, 3.25, 2.25, 6.5, 360/358.5); //Initializes chassis
+//Vertical wheel diameter    
+DRIVETRAIN_VERTICAL_WHEEL_DIAMETER,       
+
+//Horizontal to center distance 
+DRIVETRAIN_HORIZONTAL_TO_CENTER_DISTANCE,
+
+//Vertical to center distance                  
+DRIVETRAIN_VERTICAL_TO_CENTER_DISTANCE,
+
+//Inertial scale                 
+DRIVETRAIN_INERTIAL_SCALE       
+); 
 
 
 void preAuton(){
@@ -49,14 +50,13 @@ void preAuton(){
 
   //Auton Selector
   bool selectingSide = true;
-  bool redAlliance; //True = red, False = blue
   bool selectingAuton = true;
 
   while (selectingSide){ //Selects the alliance color
     Controller1.Screen.setCursor(1, 6);
     Controller1.Screen.print("Alliance Color");
 
-    if (redAlliance){
+    if (allianceColor == "Red"){
       Controller1.Screen.setCursor(3, 2);
       Controller1.Screen.print("Red x");
       Controller1.Screen.setCursor(3, 18);
@@ -72,13 +72,13 @@ void preAuton(){
     if (pressed(Left)){ //Press left button to select red alliance
       Controller1.Screen.clearScreen();
 
-      redAlliance = true;
+      allianceColor = "Red";
     }
 
     if (pressed(Right)){ //Press right button to select blue alliance
       Controller1.Screen.clearScreen();
 
-      redAlliance = false;
+      allianceColor = "Blue";
     }
 
     if (pressed(Up)){ //Press up button to select
@@ -107,21 +107,21 @@ void preAuton(){
       Controller1.Screen.setCursor(1, 5);
       Controller1.Screen.print("Auton Selected:");
 
-      if (!redAlliance){ //Prints the corresponding text and the corresponding column
-        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1]);
-        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1].c_str());
+      if (allianceColor == "Red"){ //Prints the corresponding text and the corresponding column
+        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - 1]); 
+        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - 1].c_str());
       }
       //Offset by one to correspond to correct auton because AutonNone takes an extra spot
       else {
-        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - 1]); 
-        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - 1].c_str());
+        Controller1.Screen.setCursor(3, columns[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1]);
+        Controller1.Screen.print(autonNames[static_cast<int> (currentAuton) - ((static_cast<int> (AutonCount) - 1) / 2) /* Offset by half of the auton count (excluding AutonNone) */ - 1].c_str());
       }
     }
   
     if (pressed(Left)){ //Press left button go left on auton list
       Controller1.Screen.clearScreen();
 
-      if (redAlliance){
+      if (allianceColor == "Red"){
         if (currentAuton == AutonNone || currentAuton == redAutons[0]){ //Sets auton to last one if press left on first
           currentAuton = redAutons[sizeof(redAutons) / sizeof(redAutons[0]) - 1];
         }
@@ -142,7 +142,7 @@ void preAuton(){
     if (pressed(Right)){ //Press right button go left on auton list
       Controller1.Screen.clearScreen();
 
-      if (redAlliance){
+      if (allianceColor == "Red"){
         if (currentAuton == AutonNone || currentAuton == redAutons[sizeof(redAutons) / sizeof(redAutons[0]) - 1]){ //Sets auton to first one if press right on last
           currentAuton = redAutons[0];
         }
@@ -177,47 +177,47 @@ void preAuton(){
 
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
-
-  switch (currentAuton){ //Runs corresponding auton
-    case AutonNone: {
-      break;
-    }
-    case AutonRedSoloAWP: {
-      runAutonRedSoloAWP();
-      break;
-    }
-    case AutonRedRushAWP: {
-      runAutonRedRushAWP();
-      break;
-    }
-    case AutonRedStackAWP: {
-      runAutonRedStackAWP();
-      break;
-    }
-    case AutonRedGoalRush: {
-      runAutonRedGoalRush();
-      break;
-    }
-    case AutonBlueSoloAWP: {
-      runAutonBlueSoloAWP();
-      break;
-    }
-    case AutonBlueRushAWP: {
-      runAutonBlueRushAWP();
-      break;
-    }
-    case AutonBlueStackAWP: {
-      runAutonBlueStackAWP();
-      break;
-    }
-    case AutonBlueGoalRush: {
-      runAutonBlueGoalRush();
-      break;
-    }
-    default: {
-      break;
-    }
-  }
+  runDriveTest();
+  // switch (currentAuton){ //Runs corresponding auton
+  //   case AutonNone: {
+  //     break;
+  //   }
+  //   case AutonRedSoloAWP: {
+  //     runAutonRedSoloAWP();
+  //     break;
+  //   }
+  //   case AutonRedRushAWP: {
+  //     runAutonRedRushAWP();
+  //     break;
+  //   }
+  //   case AutonRedStackAWP: {
+  //     runAutonRedStackAWP();
+  //     break;
+  //   }
+  //   case AutonRedGoalRush: {
+  //     runAutonRedGoalRush();
+  //     break;
+  //   }
+  //   case AutonBlueSoloAWP: {
+  //     runAutonBlueSoloAWP();
+  //     break;
+  //   }
+  //   case AutonBlueRushAWP: {
+  //     runAutonBlueRushAWP();
+  //     break;
+  //   }
+  //   case AutonBlueStackAWP: {
+  //     runAutonBlueStackAWP();
+  //     break;
+  //   }
+  //   case AutonBlueGoalRush: {
+  //     runAutonBlueGoalRush();
+  //     break;
+  //   }
+  //   default: {
+  //     break;
+  //   }
+  // }
 
   Controller1.Screen.setCursor(2, 6);
   Controller1.Screen.print((Brain.Timer.time() - startTime) / 1000); //Records time spent

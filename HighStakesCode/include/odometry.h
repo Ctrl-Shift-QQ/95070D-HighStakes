@@ -6,16 +6,16 @@
 class Odometry {
     //In inches and degrees unless otherwise specified
     private:
-        double previousSidewaysPosition;
-        double previousForwardPosition;
+        double previousHorizontalPosition;
+        double previousVerticalPosition;
         double previousOrientationRad;
-        double sidewaysWheelDiameter;
-        double forwardWheelDiameter;
-        double sidewaysToCenterDistance;
-        double forwardToCenterDistance;
+        double horizontalWheelDiameter;
+        double verticalWheelDiameter;
+        double horizontalToCenterDistance;
+        double verticalToCenterDistance;
         double inertialScale; //Accounts for IMU inaccuracy
     public:
-        Odometry(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
+        Odometry(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale); //Constructor
 
         double xPosition;
         double yPosition;

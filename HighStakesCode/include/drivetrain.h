@@ -12,7 +12,7 @@ class Drivetrain {
         task positionTrackTask;
 
     public:
-        Drivetrain(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale); //Constructor
+        Drivetrain(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale); //Constructor
 
         /******************** Odometry ********************/
 

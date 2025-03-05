@@ -2,14 +2,13 @@
 #include "drivetrain.h"
 #include <iostream>
 
-Drivetrain::Drivetrain(double sidewaysWheelDiameter, double forwardWheelDiameter, double sidewaysToCenterDistance, double forwardToCenterDistance, double inertialScale):
-    odom(sidewaysWheelDiameter, forwardWheelDiameter, sidewaysToCenterDistance, forwardToCenterDistance, inertialScale)
+Drivetrain::Drivetrain(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale):
+    odom(horizontalWheelDiameter, verticalWheelDiameter, horizontalToCenterDistance, verticalToCenterDistance, inertialScale)
 {};
 
 /******************** Odometry ********************/
 
 int Drivetrain::trackPosition(){
-    int i = 0;
     while (true){
         chassis.odom.updatePosition();
 
@@ -108,11 +107,8 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 }
 
 void Drivetrain::driveDistance(double targetDistance, double targetHeading, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
-    double startX = odom.xPosition;
-    double startY = odom.yPosition;
-    double polarHeadingRad = degToRad(fmod(90 - headingToPolar(targetHeading) + 360, 360));
-    double distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled
-    double driveError = targetDistance - distanceTraveled;
+    double startPosition = RightFront.position(turns);
+    double driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightFront.position(turns) - startPosition) * M_PI * 3.25);
     double turnError = headingError(targetHeading, odom.orientation);
     double driveOutput = 0;
     double turnOutput = 0;
@@ -124,8 +120,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
     PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
-        distanceTraveled = (odom.xPosition - startX) * sin(polarHeadingRad) + (odom.yPosition - startY) * cos(polarHeadingRad); //Straight line distance traveled
-        driveError = targetDistance - distanceTraveled;
+        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * RightFront.position(turns) * M_PI * 3.25);
         turnError = headingError(targetHeading, odom.orientation);
         
         driveOutput = drivePID.output(driveError);

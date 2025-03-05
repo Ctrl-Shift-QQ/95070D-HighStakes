@@ -20,7 +20,6 @@ extern motor_group Arm;
 extern rotation ArmRotation;
 extern optical IntakeOptical;
 extern inertial Inertial;
-extern rotation SidewaysTracker;
-extern rotation ForwardTracker;
+extern rotation HorizontalTracker;
 extern digital_out MogoMech;
 extern digital_out Doinker;
