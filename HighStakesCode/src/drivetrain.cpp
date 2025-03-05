@@ -120,7 +120,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
     PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
-        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * RightFront.position(turns) * M_PI * 3.25);
+        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightFront.position(turns) - startPosition) * M_PI * 3.25);
         turnError = headingError(targetHeading, odom.orientation);
         
         driveOutput = drivePID.output(driveError);
