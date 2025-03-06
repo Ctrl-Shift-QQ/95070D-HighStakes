@@ -177,47 +177,47 @@ void preAuton(){
 
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
-  runDriveTest();
-  // switch (currentAuton){ //Runs corresponding auton
-  //   case AutonNone: {
-  //     break;
-  //   }
-  //   case AutonRedSoloAWP: {
-  //     runAutonRedSoloAWP();
-  //     break;
-  //   }
-  //   case AutonRedRushAWP: {
-  //     runAutonRedRushAWP();
-  //     break;
-  //   }
-  //   case AutonRedStackAWP: {
-  //     runAutonRedStackAWP();
-  //     break;
-  //   }
-  //   case AutonRedGoalRush: {
-  //     runAutonRedGoalRush();
-  //     break;
-  //   }
-  //   case AutonBlueSoloAWP: {
-  //     runAutonBlueSoloAWP();
-  //     break;
-  //   }
-  //   case AutonBlueRushAWP: {
-  //     runAutonBlueRushAWP();
-  //     break;
-  //   }
-  //   case AutonBlueStackAWP: {
-  //     runAutonBlueStackAWP();
-  //     break;
-  //   }
-  //   case AutonBlueGoalRush: {
-  //     runAutonBlueGoalRush();
-  //     break;
-  //   }
-  //   default: {
-  //     break;
-  //   }
-  // }
+
+  switch (currentAuton){ //Runs corresponding auton
+    case AutonNone: {
+      break;
+    }
+    case AutonRedSoloAWP: {
+      runAutonRedSoloAWP();
+      break;
+    }
+    case AutonRedRushAWP: {
+      runAutonRedRushAWP();
+      break;
+    }
+    case AutonRedStackAWP: {
+      runAutonRedStackAWP();
+      break;
+    }
+    case AutonRedGoalRush: {
+      runAutonRedGoalRush();
+      break;
+    }
+    case AutonBlueSoloAWP: {
+      runAutonBlueSoloAWP();
+      break;
+    }
+    case AutonBlueRushAWP: {
+      runAutonBlueRushAWP();
+      break;
+    }
+    case AutonBlueStackAWP: {
+      runAutonBlueStackAWP();
+      break;
+    }
+    case AutonBlueGoalRush: {
+      runAutonBlueGoalRush();
+      break;
+    }
+    default: {
+      break;
+    }
+  }
 
   Controller1.Screen.setCursor(2, 6);
   Controller1.Screen.print((Brain.Timer.time() - startTime) / 1000); //Records time spent
@@ -225,6 +225,8 @@ void autonomous(){
 }
 
 void usercontrol(){
+  task::stopAll; //Stops tasks from auton
+
   while (true){
     if (!runningPreAuton){
       runArcadeDrive(100, 100);

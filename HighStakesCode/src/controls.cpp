@@ -212,6 +212,8 @@ void runArm(){
             } 
         }
         else if (pressed(ARM_DESCORE_BUTTON_ID)){
+            currentMacro = 0; //Sets next position to load
+
             targetPosition = ARM_DESCORE_POSITION;
             armPID.startError = targetPosition;
 
