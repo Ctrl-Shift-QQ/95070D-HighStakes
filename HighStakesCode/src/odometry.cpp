@@ -22,13 +22,14 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     //Sets sensor values accordingly
     Inertial.setRotation(orientation / (360 / inertialScale), degrees);
     HorizontalTracker.resetPosition();
-    RightFront.resetPosition();
+    LeftDrive.resetPosition();
+    RightDrive.resetPosition();
 }
 
 void Odometry::updatePosition(){
     //Saves values so that they don't change during the same cycle
     double horizontalTrackerPosition = HorizontalTracker.position(turns);
-    double verticalTrackerPosition = RightFront.position(turns) * DRIVETRAIN_GEAR_RATIO;
+    double verticalTrackerPosition = (LeftDrive.position(turns) + RightDrive.position(turns)) / 2 * DRIVETRAIN_GEAR_RATIO;
     this->orientation = fmod(fmod(Inertial.rotation(degrees) * (360 / inertialScale), 360) + 360, 360);
     double orientationRad = degToRad(orientation);
     double horizontalPositionDelta = (horizontalTrackerPosition - previousHorizontalPosition) * M_PI * horizontalWheelDiameter; //Gets change in inches

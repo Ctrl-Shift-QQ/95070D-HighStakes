@@ -107,8 +107,8 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 }
 
 void Drivetrain::driveDistance(double targetDistance, double targetHeading, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
-    double startPosition = RightFront.position(turns);
-    double driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightFront.position(turns) - startPosition) * M_PI * 3.25);
+    double startPosition = RightBack.position(turns);
+    double driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightBack.position(turns) - startPosition) * M_PI * DRIVETRAIN_VERTICAL_WHEEL_DIAMETER);
     double turnError = headingError(targetHeading, odom.orientation);
     double driveOutput = 0;
     double turnOutput = 0;
@@ -120,7 +120,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
     PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
-        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightFront.position(turns) - startPosition) * M_PI * 3.25);
+        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightBack.position(turns) - startPosition) * M_PI * DRIVETRAIN_VERTICAL_WHEEL_DIAMETER);
         turnError = headingError(targetHeading, odom.orientation);
         
         driveOutput = drivePID.output(driveError);

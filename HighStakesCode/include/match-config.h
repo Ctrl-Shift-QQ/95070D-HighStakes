@@ -15,8 +15,8 @@ typedef enum { //Enum for each of the autons
   AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
 } Auton;
 
-extern std::string allianceColor = "Red";
+extern std::string allianceColor;
 
-extern Auton currentAuton = AutonNone;
+extern Auton currentAuton;
 
-extern bool runningPreAuton = true; //Prevents driver control from running during pre-auton
+extern bool runningPreAuton; //Prevents driver control from running during pre-auton

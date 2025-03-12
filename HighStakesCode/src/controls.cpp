@@ -155,7 +155,7 @@ void runTankDrive(double percentSpeed, bool toggleSpeed, ButtonID toggleSpeedBut
     double leftDriveSpeed = Controller1.Axis3.position(percent) * percentSpeed / 100;
     double rightDriveSpeed = Controller1.Axis2.position(percent) * percentSpeed / 100;
 
-    if (IDToButton(toggleSpeedButtonID).pressing()){ //Makes drivetrain move slower when in slowmode
+    if (toggleSpeed && IDToButton(toggleSpeedButtonID).pressing()){ //Makes drivetrain move slower when in slowmode
         leftDriveSpeed *= slowPercentSpeed / 100;
         rightDriveSpeed *= slowPercentSpeed / 100;
     }
@@ -168,7 +168,7 @@ void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSp
     double leftDriveSpeed = (Controller1.Axis3.position(percent) + (Controller1.Axis1.position(percent) * steerPercentSpeed / 100)) * percentSpeed / 100;
     double rightDriveSpeed = (Controller1.Axis3.position(percent) - (Controller1.Axis1.position(percent) * steerPercentSpeed / 100)) * percentSpeed / 100;
 
-    if (IDToButton(toggleSpeedButtonID).pressing()){ //Makes drivetrain move slower when in slowmode
+    if (toggleSpeed && IDToButton(toggleSpeedButtonID).pressing()){ //Makes drivetrain move slower when in slowmode
         leftDriveSpeed *= slowPercentSpeed / 100;
         rightDriveSpeed *= slowPercentSpeed / 100;
     }
@@ -189,7 +189,7 @@ void runArm(){
     static double FFOutput = 0;
     static double output = 0;
 
-    static PID armPID(targetPosition, ARM_MACRO_KP, 0, 0, 0, ARM_MACRO_DEADBAND, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
+    static PID armPID(targetPosition, ARM_MACRO_KP, 0, 0, 0, 0, DEFAULT_LOOP_CYCLE_TIME, 0, 0);
 
     if (IDToButton(ARM_SPIN_BUTTON_ID).pressing()){ //Manual
         motorHold(ARM_MANUAL_SPEED, Arm, ARM_SPIN_BUTTON_ID, Null);
@@ -218,7 +218,7 @@ void runArm(){
             armPID.startError = targetPosition;
 
             if (targetPosition > ARM_LOADING_POSITION){
-                Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+                SecondIntake.spin(reverse, ARM_INTAKE_SPEED, percent);
             }
         }
 
@@ -227,12 +227,7 @@ void runArm(){
 
         output = PIDOutput + FFOutput;
 
-        if (!armPID.isSettled(targetPosition - ArmRotation.position(degrees))){
-            Arm.spin(forward, percentToVolts(output), volt);
-        }
-        else {
-            Arm.stop(brake);
-        }
+        Arm.spin(forward, percentToVolts(output), volt);
     }
 }
 

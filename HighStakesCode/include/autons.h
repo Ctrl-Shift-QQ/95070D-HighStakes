@@ -2,6 +2,7 @@
 
 #include "drivetrain.h"
 #include "PID.h"
+#include "match-config.h"
 #include "mech-config.h"
 
 /******************** PID Tunings ********************/
@@ -14,6 +15,8 @@ int colorSort();
 void spinArmTo(double targetPosition);
 int armToDown();
 int armToLoad();
+int armToLadder();
+int armToUp();
 int armToAllianceStake();
 int armToWallStake();
 

@@ -18,6 +18,9 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+bool runningPreAuton = true;
+std::string allianceColor = "Red";
+Auton currentAuton = AutonNone;
 
 Drivetrain chassis(
 //Horizontal wheel diameter
@@ -35,7 +38,6 @@ DRIVETRAIN_VERTICAL_TO_CENTER_DISTANCE,
 //Inertial scale                 
 DRIVETRAIN_INERTIAL_SCALE       
 ); 
-
 
 void preAuton(){
   //Sensor reset and calibration
@@ -225,10 +227,10 @@ void autonomous(){
 }
 
 void usercontrol(){
-  task::stopAll; //Stops tasks from auton
-
   while (true){
     if (!runningPreAuton){
+      static task colorSort = task(colorSort);
+
       runArcadeDrive(100, 100);
 
       runIntake();
