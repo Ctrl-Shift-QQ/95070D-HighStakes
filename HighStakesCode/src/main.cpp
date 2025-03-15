@@ -182,6 +182,7 @@ void autonomous(){
 
   switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
+      runProgSkills();
       break;
     }
     case AutonRedSoloAWP: {
