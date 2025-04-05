@@ -32,6 +32,7 @@ inertial Inertial = inertial(PORT12);
 rotation HorizontalTracker = rotation(PORT13, false);
 digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
 digital_out Doinker = digital_out(Brain.ThreeWirePort.G);
+digital_out IntakeLift = digital_out(Brain.ThreeWirePort.B);
 
 
 // VEXcode generated functions

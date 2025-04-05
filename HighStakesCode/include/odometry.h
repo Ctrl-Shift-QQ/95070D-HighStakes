@@ -4,7 +4,7 @@
 #include "util.h"
 
 class Odometry {
-    //In inches and degrees unless otherwise specified
+    //Units: inches and degrees unless otherwise specified
     private:
         double previousHorizontalPosition;
         double previousVerticalPosition;
@@ -15,12 +15,12 @@ class Odometry {
         double verticalToCenterDistance;
         double inertialScale; //Accounts for IMU inaccuracy
     public:
-        Odometry(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale); //Constructor
+        Odometry(double horizontalToCenterDistance, double verticalToCenterDistance); //Constructor
 
         double xPosition;
         double yPosition;
         double orientation;
         
         void setPosition(double xPosition, double yPosition, double orientation);
-        void updatePosition();
+        void updatePosition(double horizontalTrackerPosition, double verticalHorizontalPosition, double orientation);
 };

@@ -4,23 +4,50 @@
 #include "PID.h"
 #include <iostream>
 
+enum OdomType{
+    ZeroTrackerOdom = 0,
+    OneTrackerOdom,
+    TwoTrackerOdom,
+};
+
 class Drivetrain {
+    //Units: inches and degrees unless otherwise specified
     private:
-        /******************** Position tracking ********************/
+        motor_group &LeftDrive; 
+        motor_group &RightDrive;
+        rotation &HorizontalTracker;
+        rotation &VerticalTracker; 
+        inertial &Inertial;
+
+        double gearRatio;
+        double verticalWheelDiameter; 
+        double verticalToCenterDistance; 
+        double horizontalWheelDiameter;
+        double horizontalToCenterDistance;
+        double inertialScale;
+
+        OdomType odomType;
 
         static int trackPosition();
         task positionTrackTask;
-
     public:
-        Drivetrain(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale); //Constructor
+        Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, inertial &Inertial, double inertialScale); //Zero Tracker Odom Constructor
+        Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, 
+                   rotation &HorizontalTracker, double horizontalWheelDiameter, double horizontalToCenterDistance, inertial &Inertial, double inertialScale); //One Tracker Odom Constructor
+        Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, rotation &VerticalTracker, double verticalWheelDiameter, double verticalToCenterDistance, 
+                   rotation &HorizontalTracker, double horizontalWheelDiameter, double horizontalToCenterDistance, inertial &Inertial, double inertialScale); //Two Tracker Odom Constructor
 
-        /******************** Odometry ********************/
+        double getHorizontalTrackerPosition();
+        double getVerticalTrackerPosition();
+        double getAbsoluteHeading();
 
+        void resetHorizontalTrackerPosition();
+        void resetVerticalTrackerPosition();
+        void setAbsoluteHeading(double heading);
+        
         Odometry odom;
 
-        void setCoordinates(double startPositionX, double startPositionY, double startPositionOrientation); //Sets coordinates and starts position tracking
-
-        /******************** PID constants ********************/
+        void initializeOdom(double startPositionX, double startPositionY, double startPositionOrientation); //Sets coordinates and starts position tracking
 
         typedef struct {
             double kp;
@@ -57,8 +84,6 @@ class Drivetrain {
         settleConstants defaultHeadingSettleConstants;
         settleConstants defaultTurnSettleConstants;
         settleConstants defaultSwingSettleConstants;
-
-        /******************** Motion algorithms ********************/
 
         void driveToPoint(double targetX, double targetY);
         void driveToPoint(double targetX, double targetY, clampConstants driveClampConstants);

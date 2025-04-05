@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-typedef enum { //Enum for each of the autons
+enum Auton {
   AutonNone = 0,
   AutonRedSoloAWP,
   AutonRedRushAWP,
@@ -13,7 +13,7 @@ typedef enum { //Enum for each of the autons
   AutonBlueStackAWP,
   AutonBlueGoalRush,
   AutonCount, //Gives easy access to auton count via static_cast<int> AutonCount
-} Auton;
+};
 
 extern std::string allianceColor;
 

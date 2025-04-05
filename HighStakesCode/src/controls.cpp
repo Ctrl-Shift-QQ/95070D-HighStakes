@@ -149,7 +149,6 @@ void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID){ //Toggl
     }
 }
 
-/******************** Controls ********************/
 
 void runTankDrive(double percentSpeed, bool toggleSpeed, ButtonID toggleSpeedButtonID, double slowPercentSpeed){ //Each joystick controls the movement of the corresponding side of the drivetrain
     double leftDriveSpeed = Controller1.Axis3.position(percent) * percentSpeed / 100;

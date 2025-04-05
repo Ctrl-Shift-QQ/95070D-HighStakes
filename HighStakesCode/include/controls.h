@@ -3,7 +3,7 @@
 #include "mech-config.h"
 #include "PID.h"
 
-typedef enum { //For pressed function
+typedef enum { //For pressed and released functions
     Up = 0,
     Left,
     Right,
@@ -29,8 +29,6 @@ void motorHold(double percentSpeed, motor_group &controlMotor, ButtonID forwardB
 void pistonHold(bool reverse, digital_out &controlPiston, ButtonID controlButtonID);
 void motorToggle(directionType motorDirection, double percentSpeed, motor_group &controlMotor, ButtonID controlButtonID);
 void pistonToggle(digital_out &controlPiston, ButtonID controlButtonID);
-
-/******************** Controls ********************/
 
 void runTankDrive(double percentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);
 void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSpeed = false, ButtonID toggleSpeedButtonID = A, double slowPercentSpeed = 0);

@@ -2,15 +2,99 @@
 #include "drivetrain.h"
 #include <iostream>
 
-Drivetrain::Drivetrain(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale):
-    odom(horizontalWheelDiameter, verticalWheelDiameter, horizontalToCenterDistance, verticalToCenterDistance, inertialScale)
+Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, inertial &Inertial, double inertialScale): //Zero Tracker Odom Constructor
+    LeftDrive(LeftDrive),
+    RightDrive(RightDrive),
+    gearRatio(gearRatio),
+    verticalWheelDiameter(verticalWheelDiameter),
+    Inertial(Inertial),
+    inertialScale(inertialScale),
+    odomType(ZeroTrackerOdom),
+    odom(0, 0, verticalWheelDiameter, 0)
 {};
 
-/******************** Odometry ********************/
+Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, 
+                       rotation &HorizontalTracker, double horizontalWheelDiameter, double horizontalToCenterDistance, inertial &Inertial, double inertialScale): //One Tracker Odom Constructor
+    LeftDrive(LeftDrive),
+    RightDrive(RightDrive),
+    gearRatio(gearRatio),
+    verticalWheelDiameter(verticalWheelDiameter),
+    HorizontalTracker(HorizontalTracker),
+    horizontalWheelDiameter(horizontalWheelDiameter),
+    Inertial(Inertial),
+    inertialScale(inertialScale),
+    odomType(OneTrackerOdom),
+    odom(horizontalWheelDiameter, horizontalToCenterDistance, verticalWheelDiameter, 0)
+{};
+
+Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, rotation &VerticalTracker, double verticalWheelDiameter, double verticalToCenterDistance, 
+           rotation &HorizontalTracker, double horizontalWheelDiameter, double horizontalToCenterDistance, inertial &Inertial, double inertialScale): //Two Tracker Odom Constructor
+    LeftDrive(LeftDrive),
+    RightDrive(RightDrive),
+    gearRatio(gearRatio),
+    VerticalTracker(VerticalTracker);
+    verticalWheelDiameter(verticalWheelDiameter),
+    verticalToCenterDistance(verticalToCenterDistance),
+    HorizontalTracker(HorizontalTracker),
+    horizontalWheelDiameter(horizontalWheelDiameter),
+    Inertial(Inertial),
+    inertialScale(inertialScale),
+    odomType(OneTrackerOdom),
+    odom(horizontalWheelDiameter, horizontalToCenterDistance, verticalWheelDiameter, verticalToCenterDistance)
+{};
+
+
+double Drivetrain::getHorizontalTrackerPosition(){
+    double horizontalTrackerTurns = 0;
+
+    if (odomType == OneTrackerOdom || odomType == TwoTrackerOdom){
+        horizontalTrackerTurns = HorizontalTracker.position(turns);
+    }
+
+    return horizontalTrackerTurns * M_PI * horizontalWheelDiameter;
+}
+
+double Drivetrain::getVerticalTrackerPosition(){
+    double verticalTrackerTurns = 0;
+
+    if (odomType == ZeroTrackerOdom || odomType == OneTrackerOdom){
+        verticalTrackerTurns = gearRatio * (LeftDrive.position(turns) + RightDrive.position(turns));
+    }
+    else if (odomType == TwoTrackerOdom){
+        verticalTrackerTurns = VerticalTracker.position(turns);
+    }
+    
+    return verticalTrackerTurns * M_PI * verticalWheelDiameter;
+}
+
+double Drivetrain::getAbsoluteHeading(){
+    return fmod(fmod(Inertial.rotation(degrees) * (360 / inertialScale), 360) + 360, 360);
+}
+
+void Drivetrain::resetHorizontalTrackerPosition(){
+    if (odomType == OneTrackerOdom || odomType == TwoTrackerOdom){
+        HorizontalTracker.resetPosition();
+    }
+}
+
+void Drivetrain::resetVerticalTrackerPosition(){
+    if (odomType == ZeroTrackerOdom || odomType == OneTrackerOdom){
+        LeftDrive.resetPosition();
+        RightDrive.resetPosition();
+    }
+    else if (odomType == TwoTrackerOdom){
+        VerticalTracker.resetPosition();
+    }
+}
+        
+void Drivetrain::setAbsoluteHeading(double heading){
+    Inertial.setRotation(heading / (360 / inertialScale));
+}
+
 
 int Drivetrain::trackPosition(){
     while (true){
-        chassis.odom.updatePosition();
+        chassis.odom.updatePosition(getHorizontalTrackerPosition(), getVerticalTrackerPosition(), getAbsoluteHeading());
 
         wait(5, msec);
     }
@@ -18,12 +102,15 @@ int Drivetrain::trackPosition(){
     return 0;
 }
 
-void Drivetrain::setCoordinates(double startPositionX, double startPositionY, double startPositionOrientation){
+void Drivetrain::initializeOdom(double startPositionX, double startPositionY, double startPositionOrientation){
     odom.setPosition(startPositionX, startPositionY, startPositionOrientation);
+    resetHorizontalTrackerPosition();
+    resetVerticalTrackerPosition();
+    setAbsoluteHeading(startPositionOrientation);
+
     positionTrackTask = task(trackPosition);
 }
 
-/******************** Motion Algorithms ********************/
 
 void Drivetrain::driveToPoint(double targetX, double targetY){
     driveToPoint(targetX, targetY, defaultDriveClampConstants, defaultDriveSettleConstants, defaultDriveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants); 

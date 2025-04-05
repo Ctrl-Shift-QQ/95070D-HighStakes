@@ -23,3 +23,4 @@ extern inertial Inertial;
 extern rotation HorizontalTracker;
 extern digital_out MogoMech;
 extern digital_out Doinker;
+extern digital_out IntakeLift;

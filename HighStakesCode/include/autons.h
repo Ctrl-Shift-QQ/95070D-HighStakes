@@ -5,14 +5,10 @@
 #include "match-config.h"
 #include "mech-config.h"
 
-/******************** PID Tunings ********************/
-
 void setDefaultPIDConstants();
 
-/******************** Tasks ********************/
-
-int colorSort();
-void spinArmTo(double targetPosition);
+int controlIntake();
+void controlArm();
 int armToDown();
 int armToLoad();
 int armToLadder();
@@ -20,14 +16,10 @@ int armToUp();
 int armToAllianceStake();
 int armToWallStake();
 
-/******************** Tests ********************/
-
 void runOdomTest();
 void runDriveTest();
 void runTurnTest();
 void runSwingTest();
-
-/******************** Autons ********************/
 
 void runAutonRedSoloAWP();
 void runAutonRedRushAWP();
@@ -37,7 +29,5 @@ void runAutonBlueSoloAWP();
 void runAutonBlueRushAWP();
 void runAutonBlueStackAWP();
 void runAutonBlueGoalRush();
-
-/******************** Prog Skills ********************/
 
 void runProgSkills();

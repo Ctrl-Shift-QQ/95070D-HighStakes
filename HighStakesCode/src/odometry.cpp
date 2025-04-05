@@ -2,12 +2,9 @@
 #include "odometry.h"
 #include <iostream>
 
-Odometry::Odometry(double horizontalWheelDiameter, double verticalWheelDiameter, double horizontalToCenterDistance, double verticalToCenterDistance, double inertialScale) :
-    horizontalWheelDiameter(horizontalWheelDiameter),
-    verticalWheelDiameter(verticalWheelDiameter),
+Odometry::Odometry(double horizontalToCenterDistance, double verticalWheelDiameter):
     horizontalToCenterDistance(horizontalToCenterDistance),
-    verticalToCenterDistance(verticalToCenterDistance),
-    inertialScale(inertialScale)
+    verticalToCenterDistance(verticalToCenterDistance)
 {};
 
 void Odometry::setPosition(double xPosition, double yPosition, double orientation){
@@ -18,22 +15,14 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     this->previousHorizontalPosition = 0;
     this->previousVerticalPosition = 0;
     this->previousOrientationRad = degToRad(orientation);
-
-    //Sets sensor values accordingly
-    Inertial.setRotation(orientation / (360 / inertialScale), degrees);
-    HorizontalTracker.resetPosition();
-    LeftDrive.resetPosition();
-    RightDrive.resetPosition();
 }
 
-void Odometry::updatePosition(){
-    //Saves values so that they don't change during the same cycle
-    double horizontalTrackerPosition = HorizontalTracker.position(turns);
-    double verticalTrackerPosition = (LeftDrive.position(turns) + RightDrive.position(turns)) / 2 * DRIVETRAIN_GEAR_RATIO;
-    this->orientation = fmod(fmod(Inertial.rotation(degrees) * (360 / inertialScale), 360) + 360, 360);
-    double orientationRad = degToRad(orientation);
+void Odometry::updatePosition(double horizontalTrackerPosition, double verticalHorizontalPosition, double orientation){
+    //Saves values for consistency within cycle
     double horizontalPositionDelta = (horizontalTrackerPosition - previousHorizontalPosition) * M_PI * horizontalWheelDiameter; //Gets change in inches
     double verticalPositionDelta = (verticalTrackerPosition - previousVerticalPosition) * M_PI * verticalWheelDiameter ; //Gets change in inches
+    this->orientation = orientation;
+    double orientationRad = degToRad(orientation);
     double orientationDeltaRad = orientationRad - previousOrientationRad;
     double localXPosition;
     double localYPosition;
@@ -43,7 +32,7 @@ void Odometry::updatePosition(){
     double xPositionDelta;
     double yPositionDelta;
 
-    //Gets local Cartesian translation coordinates of new position
+    //Computes new local Cartesian translation coordinates
     if (orientationDeltaRad == 0){
         localXPosition = horizontalPositionDelta;
         localYPosition = verticalPositionDelta;
@@ -58,15 +47,15 @@ void Odometry::updatePosition(){
     globalPolarAngle = localPolarAngle - previousOrientationRad - orientationDeltaRad / 2;
     polarLength = sqrt(pow(localXPosition, 2) + pow(localYPosition, 2));
 
-    //Calculates global offset
+    //Computes global offset
     xPositionDelta = cos(globalPolarAngle) * polarLength;
     yPositionDelta = sin(globalPolarAngle) * polarLength;
 
-    //Applies offset to get updated values
+    //Applies offset to update values
     this->xPosition += xPositionDelta;
     this->yPosition += yPositionDelta;
     
-    //Sets previous values of next cycle to current values
+    //Updates previous cycle values for next cycle
     this->previousHorizontalPosition = horizontalTrackerPosition;
     this->previousVerticalPosition = verticalTrackerPosition;
     this->previousOrientationRad = orientationRad;

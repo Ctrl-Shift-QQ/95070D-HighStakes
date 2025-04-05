@@ -231,7 +231,6 @@ void usercontrol(){
   while (true){
     if (!runningPreAuton){
       static task colorSort = task(colorSort);
-
       runArcadeDrive(100, 100);
 
       runIntake();
