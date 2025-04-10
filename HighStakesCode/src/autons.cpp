@@ -77,14 +77,16 @@ int controlIntake(){
     IntakeOptical.setLightPower(100, percent);
 
     while (true){
-        if (headingError(hue, IntakeOptical.hue()) < hueRange){
-            Intake.spin(forward, intakeTargetVelocity, percent);
+        Intake.spin(forward, intakeTargetVelocity, percent);
+
+        if (headingError(hue, IntakeOptical.hue()) < hueRange){ //Color sort
+            while (IntakeDistance.objectDistance(inches) > SORT_DETECT_RING_RANGE){
+                wait(DEFAULT_LOOP_CYCLE_TIME);
+            }
+
             wait(SORT_DETECT_TO_SORT_DELAY, msec);
-
             Intake.stop(brake);
-
             wait(SORT_SORT_TO_CONTINUE_DELAY, msec);
-            Intake.spin(forward, intakeTargetVelocity, percent);
         }
 
         wait(DEFAULT_LOOP_CYCLE_TIME / 2, msec);
@@ -119,63 +121,63 @@ void controlArm(){
 
 
 void runOdomTest(){
-//     Inertial.calibrate();
-//     wait(3, sec);
-//     chassis.setCoordinates(-60, 12, 225);
+    Inertial.calibrate();
+    wait(3, sec);
+    chassis.setCoordinates(-60, 12, 225);
 
-//     while (true){
-//         Controller1.Screen.clearScreen();
-//         Controller1.Screen.setCursor(1, 3);
-//         Controller1.Screen.print("X: ");
-//         Controller1.Screen.print(chassis.odom.xPosition);
-//         Controller1.Screen.setCursor(2, 3);
-//         Controller1.Screen.print("Y: ");
-//         Controller1.Screen.print(chassis.odom.yPosition);
-//         Controller1.Screen.setCursor(3, 3);
-//         Controller1.Screen.print("O: ");
-//         Controller1.Screen.print(chassis.odom.orientation);
+    while (true){
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1, 3);
+        Controller1.Screen.print("X: ");
+        Controller1.Screen.print(chassis.odom.xPosition);
+        Controller1.Screen.setCursor(2, 3);
+        Controller1.Screen.print("Y: ");
+        Controller1.Screen.print(chassis.odom.yPosition);
+        Controller1.Screen.setCursor(3, 3);
+        Controller1.Screen.print("O: ");
+        Controller1.Screen.print(chassis.odom.orientation);
 
-//         wait(100, msec);
-//     }
+        wait(100, msec);
+    }
 }
 
 void runDriveTest(){
-//     chassis.setCoordinates(0, 0, 0);
-//     setDefaultPIDConstants();
+    chassis.setCoordinates(0, 0, 0);
+    setDefaultPIDConstants();
 
-//     chassis.driveDistance(12, 0);
-//     chassis.driveDistance(24, 0);
-//     chassis.driveDistance(-24, 0);
-//     chassis.driveDistance(-12, 0);
+    chassis.driveDistance(12, 0);
+    chassis.driveDistance(24, 0);
+    chassis.driveDistance(-24, 0);
+    chassis.driveDistance(-12, 0);
 
-//     chassis.stopDrive(brake);
+    chassis.stopDrive(brake);
 }
 
 void runTurnTest(){
-//     chassis.setCoordinates(0, 0, 0);
-//     setDefaultPIDConstants();
+    chassis.setCoordinates(0, 0, 0);
+    setDefaultPIDConstants();
 
-//     chassis.turnToHeading(22.5);
-//     chassis.turnToHeading(45);
-//     chassis.turnToHeading(90);
-//     chassis.turnToHeading(180);
-//     chassis.turnToHeading(270);
-//     chassis.turnToHeading(45);
-//     chassis.turnToHeading(0);
+    chassis.turnToHeading(22.5);
+    chassis.turnToHeading(45);
+    chassis.turnToHeading(90);
+    chassis.turnToHeading(180);
+    chassis.turnToHeading(270);
+    chassis.turnToHeading(45);
+    chassis.turnToHeading(0);
 
-//     chassis.stopDrive(brake);
+    chassis.stopDrive(brake);
 }
 
 void runSwingTest(){
-//     chassis.setCoordinates(0, 0, 0);
-//     setDefaultPIDConstants();
+    chassis.setCoordinates(0, 0, 0);
+    setDefaultPIDConstants();
 
-//     chassis.swingToHeading("Left", 90);
-//     chassis.swingToHeading("Right", 270);
-//     chassis.swingToHeading("Right", 90);
-//     chassis.swingToHeading("Left", 0);
+    chassis.swingToHeading("Left", 90);
+    chassis.swingToHeading("Right", 270);
+    chassis.swingToHeading("Right", 90);
+    chassis.swingToHeading("Left", 0);
 
-//     chassis.stopDrive(brake);
+    chassis.stopDrive(brake);
 }
 
 

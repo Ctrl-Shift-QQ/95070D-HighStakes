@@ -2,7 +2,7 @@
 #include "odometry.h"
 #include <iostream>
 
-Odometry::Odometry(double horizontalToCenterDistance, double verticalWheelDiameter):
+Odometry::Odometry(double horizontalToCenterDistance, double verticalToCenterDistance):
     horizontalToCenterDistance(horizontalToCenterDistance),
     verticalToCenterDistance(verticalToCenterDistance)
 {};
@@ -17,10 +17,10 @@ void Odometry::setPosition(double xPosition, double yPosition, double orientatio
     this->previousOrientationRad = degToRad(orientation);
 }
 
-void Odometry::updatePosition(double horizontalTrackerPosition, double verticalHorizontalPosition, double orientation){
+void Odometry::updatePosition(double horizontalTrackerPosition, double verticalTrackerPosition, double orientation){
     //Saves values for consistency within cycle
-    double horizontalPositionDelta = (horizontalTrackerPosition - previousHorizontalPosition) * M_PI * horizontalWheelDiameter; //Gets change in inches
-    double verticalPositionDelta = (verticalTrackerPosition - previousVerticalPosition) * M_PI * verticalWheelDiameter ; //Gets change in inches
+    double horizontalPositionDelta = horizontalTrackerPosition - previousHorizontalPosition; //Gets change in inches
+    double verticalPositionDelta = verticalTrackerPosition - previousVerticalPosition; //Gets change in inches
     this->orientation = orientation;
     double orientationRad = degToRad(orientation);
     double orientationDeltaRad = orientationRad - previousOrientationRad;

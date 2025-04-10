@@ -2,6 +2,8 @@
 #include "drivetrain.h"
 #include <iostream>
 
+static rotation dummyRotation = rotation(PORT1);
+
 Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, inertial &Inertial, double inertialScale): //Zero Tracker Odom Constructor
     LeftDrive(LeftDrive),
     RightDrive(RightDrive),
@@ -10,7 +12,10 @@ Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double g
     Inertial(Inertial),
     inertialScale(inertialScale),
     odomType(ZeroTrackerOdom),
-    odom(0, 0, verticalWheelDiameter, 0)
+    odom(0, 0),
+    //Initialize unused references
+    VerticalTracker(dummyRotation),
+    HorizontalTracker(dummyRotation)
 {};
 
 Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, double verticalWheelDiameter, 
@@ -24,7 +29,9 @@ Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double g
     Inertial(Inertial),
     inertialScale(inertialScale),
     odomType(OneTrackerOdom),
-    odom(horizontalWheelDiameter, horizontalToCenterDistance, verticalWheelDiameter, 0)
+    odom(horizontalToCenterDistance, 0),
+    //Initialize unused references
+    VerticalTracker(dummyRotation)
 {};
 
 Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double gearRatio, rotation &VerticalTracker, double verticalWheelDiameter, double verticalToCenterDistance, 
@@ -32,7 +39,7 @@ Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double g
     LeftDrive(LeftDrive),
     RightDrive(RightDrive),
     gearRatio(gearRatio),
-    VerticalTracker(VerticalTracker);
+    VerticalTracker(VerticalTracker),
     verticalWheelDiameter(verticalWheelDiameter),
     verticalToCenterDistance(verticalToCenterDistance),
     HorizontalTracker(HorizontalTracker),
@@ -40,7 +47,7 @@ Drivetrain::Drivetrain(motor_group &LeftDrive, motor_group &RightDrive, double g
     Inertial(Inertial),
     inertialScale(inertialScale),
     odomType(OneTrackerOdom),
-    odom(horizontalWheelDiameter, horizontalToCenterDistance, verticalWheelDiameter, verticalToCenterDistance)
+    odom(horizontalToCenterDistance, verticalToCenterDistance)
 {};
 
 
@@ -88,13 +95,13 @@ void Drivetrain::resetVerticalTrackerPosition(){
 }
         
 void Drivetrain::setAbsoluteHeading(double heading){
-    Inertial.setRotation(heading / (360 / inertialScale));
+    Inertial.setRotation(heading / (360 / inertialScale), degrees);
 }
 
 
 int Drivetrain::trackPosition(){
     while (true){
-        chassis.odom.updatePosition(getHorizontalTrackerPosition(), getVerticalTrackerPosition(), getAbsoluteHeading());
+        chassis.odom.updatePosition(chassis.getHorizontalTrackerPosition(), chassis.getVerticalTrackerPosition(), chassis.getAbsoluteHeading());
 
         wait(5, msec);
     }
@@ -102,7 +109,7 @@ int Drivetrain::trackPosition(){
     return 0;
 }
 
-void Drivetrain::initializeOdom(double startPositionX, double startPositionY, double startPositionOrientation){
+void Drivetrain::setCoordinates(double startPositionX, double startPositionY, double startPositionOrientation){
     odom.setPosition(startPositionX, startPositionY, startPositionOrientation);
     resetHorizontalTrackerPosition();
     resetVerticalTrackerPosition();
@@ -194,8 +201,8 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 }
 
 void Drivetrain::driveDistance(double targetDistance, double targetHeading, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
-    double startPosition = RightBack.position(turns);
-    double driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightBack.position(turns) - startPosition) * M_PI * DRIVETRAIN_VERTICAL_WHEEL_DIAMETER);
+    double startPosition = VerticalTracker.position(turns);
+    double driveError = targetDistance - (gearRatio * (VerticalTracker.position(turns) - startPosition) * M_PI * verticalWheelDiameter);
     double turnError = headingError(targetHeading, odom.orientation);
     double driveOutput = 0;
     double turnOutput = 0;
@@ -207,7 +214,7 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
     PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
-        driveError = targetDistance - (DRIVETRAIN_GEAR_RATIO * (RightBack.position(turns) - startPosition) * M_PI * DRIVETRAIN_VERTICAL_WHEEL_DIAMETER);
+        driveError = targetDistance - (gearRatio * (VerticalTracker.position(turns) - startPosition) * M_PI * verticalWheelDiameter);
         turnError = headingError(targetHeading, odom.orientation);
         
         driveOutput = drivePID.output(driveError);

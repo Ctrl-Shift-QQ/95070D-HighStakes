@@ -23,17 +23,30 @@ std::string allianceColor = "Red";
 Auton currentAuton = AutonNone;
 
 Drivetrain chassis(
-//Horizontal wheel diameter
-DRIVETRAIN_HORIZONTAL_WHEEL_DIAMETER,
+
+//Left side of drivetrain
+LeftDrive,
+
+//Right side of drivetrain,
+RightDrive,
+
+//Drivetrain gear ratio (input / output)
+DRIVETRAIN_GEAR_RATIO,
 
 //Vertical wheel diameter    
-DRIVETRAIN_VERTICAL_WHEEL_DIAMETER,       
+DRIVETRAIN_VERTICAL_WHEEL_DIAMETER,      
+
+//Horizontal rotation sensor
+HorizontalTracker,
+
+//Horizontal wheel diameter
+DRIVETRAIN_HORIZONTAL_WHEEL_DIAMETER,
 
 //Horizontal to center distance 
 DRIVETRAIN_HORIZONTAL_TO_CENTER_DISTANCE,
 
-//Vertical to center distance                  
-DRIVETRAIN_VERTICAL_TO_CENTER_DISTANCE,
+//IMU
+Inertial,
 
 //Inertial scale                 
 DRIVETRAIN_INERTIAL_SCALE       

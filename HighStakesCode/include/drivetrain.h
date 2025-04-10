@@ -47,7 +47,7 @@ class Drivetrain {
         
         Odometry odom;
 
-        void initializeOdom(double startPositionX, double startPositionY, double startPositionOrientation); //Sets coordinates and starts position tracking
+        void setCoordinates(double startPositionX, double startPositionY, double startPositionOrientation); //Sets coordinates and starts position tracking
 
         typedef struct {
             double kp;
