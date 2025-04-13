@@ -24,13 +24,13 @@ void Odometry::updatePosition(double horizontalTrackerPosition, double verticalT
     this->orientation = orientation;
     double orientationRad = degToRad(orientation);
     double orientationDeltaRad = orientationRad - previousOrientationRad;
-    double localXPosition;
-    double localYPosition;
-    double localPolarAngle;
-    double globalPolarAngle;
-    double polarLength;
-    double xPositionDelta;
-    double yPositionDelta;
+    double localXPosition = 0;
+    double localYPosition = 0;
+    double localPolarAngle = 0;
+    double globalPolarAngle = 0;
+    double polarLength = 0;
+    double xPositionDelta = 0;
+    double yPositionDelta = 0;
 
     //Computes new local Cartesian translation coordinates
     if (orientationDeltaRad == 0){

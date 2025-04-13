@@ -8,13 +8,7 @@
 void setDefaultPIDConstants();
 
 int controlIntake();
-void controlArm();
-int armToDown();
-int armToLoad();
-int armToLadder();
-int armToUp();
-int armToAllianceStake();
-int armToWallStake();
+int controlArm();
 
 void runOdomTest();
 void runDriveTest();

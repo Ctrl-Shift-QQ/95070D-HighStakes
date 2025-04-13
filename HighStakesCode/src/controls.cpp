@@ -207,7 +207,8 @@ void runArm(){
             armPID.startError = targetPosition;
 
             if (targetPosition > ARM_LOADING_POSITION){
-                Intake.spin(reverse, ARM_INTAKE_SPEED, percent);
+                FirstIntake.stop(brake);
+                SecondIntake.spin(reverse, ARM_INTAKE_SPEED, percent);
             } 
         }
         else if (pressed(ARM_DESCORE_BUTTON_ID)){

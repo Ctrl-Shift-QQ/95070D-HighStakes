@@ -65,7 +65,7 @@ double Drivetrain::getVerticalTrackerPosition(){
     double verticalTrackerTurns = 0;
 
     if (odomType == ZeroTrackerOdom || odomType == OneTrackerOdom){
-        verticalTrackerTurns = gearRatio * (LeftDrive.position(turns) + RightDrive.position(turns));
+        verticalTrackerTurns = gearRatio * (LeftDrive.position(turns) + RightDrive.position(turns)) / 2;
     }
     else if (odomType == TwoTrackerOdom){
         verticalTrackerTurns = VerticalTracker.position(turns);
@@ -135,7 +135,7 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
     driveToPoint(targetX, targetY, driveClampConstants, driveSettleConstants, driveOutputConstants, defaultHeadingClampConstants, defaultHeadingSettleConstants, defaultHeadingOutputConstants);
 }
 
-void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants turnClampConstants, settleConstants turnSettleConstants, outputConstants turnOutputConstants){
+void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants, clampConstants headingClampConstants, settleConstants headingSettleConstants, outputConstants headingOutputConstants){
     double driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
     double turnTarget = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 360, 360); //Heading that faces target
     double turnError = 0;
@@ -147,12 +147,13 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
     }
     double driveOutput = 0;
     double turnOutput = 0;
+    double headingDeadband = radToDeg(atan2(driveSettleConstants.deadband, fabs(driveError)));
     double leftSideOutput = 0;
     double rightSideOutput = 0;
     
     //Double PID (drives and turns toward the target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, turnSettleConstants.deadband, driveSettleConstants.loopCycleTime, 0, 0);
+    PID turnPID(turnError, headingOutputConstants.kp, headingOutputConstants.ki, headingOutputConstants.kd, headingOutputConstants.startI, headingSettleConstants.deadband, driveSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
         driveError = hypot(targetX - odom.xPosition, targetY - odom.yPosition); //Straight line distance from current coordinates to target
@@ -165,13 +166,14 @@ void Drivetrain::driveToPoint(double targetX, double targetY, clampConstants dri
         }
         turnOutput = turnPID.output(turnError);
 
-        if (fabs(driveError) < turnSettleConstants.deadband){ //Prevents drastic turning when near the target
+        headingDeadband = radToDeg(atan2(driveSettleConstants.deadband, fabs(driveError)));
+        if (fabs(driveError) < headingSettleConstants.deadband || fabs(turnError) < headingDeadband){ //Prevents drastic turning when near the target
             turnOutput = 0;
         }
 
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
         driveOutput *= driveOutputScale(driveClampConstants.minimumSpeed, driveClampConstants.maximumSpeed, driveOutput, driveOutput);
-        turnOutput *= driveOutputScale(turnClampConstants.minimumSpeed, turnClampConstants.maximumSpeed, turnOutput, turnOutput);
+        turnOutput *= driveOutputScale(headingClampConstants.minimumSpeed, headingClampConstants.maximumSpeed, turnOutput, turnOutput);
 
         leftSideOutput = driveOutput + turnOutput;
         rightSideOutput = driveOutput - turnOutput;
@@ -201,8 +203,9 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 }
 
 void Drivetrain::driveDistance(double targetDistance, double targetHeading, clampConstants driveClampConstants, settleConstants driveSettleConstants, outputConstants driveOutputConstants){
-    double startPosition = VerticalTracker.position(turns);
-    double driveError = targetDistance - (gearRatio * (VerticalTracker.position(turns) - startPosition) * M_PI * verticalWheelDiameter);
+    double startPosition = getVerticalTrackerPosition();
+    double distanceTraveled = 0;
+    double driveError = targetDistance;
     double turnError = headingError(targetHeading, odom.orientation);
     double driveOutput = 0;
     double turnOutput = 0;
@@ -211,10 +214,11 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 
     //Double PID (drives and aligns towards target simultaneously)
     PID drivePID(driveError, driveOutputConstants.kp, driveOutputConstants.ki, driveOutputConstants.kd, driveOutputConstants.startI, driveSettleConstants.deadband, driveSettleConstants.loopCycleTime, driveSettleConstants.settleTime, driveSettleConstants.timeout);
-    PID turnPID(turnError, defaultDriveDistanceTurnOutputConstants.kp, defaultDriveDistanceTurnOutputConstants.ki, defaultDriveDistanceTurnOutputConstants.kd, defaultDriveDistanceTurnOutputConstants.startI, 0, defaultTurnSettleConstants.loopCycleTime, 0, 0);
+    PID turnPID(turnError, defaultHeadingOutputConstants.kp, defaultHeadingOutputConstants.ki, defaultHeadingOutputConstants.kd, defaultHeadingOutputConstants.startI, 0, driveSettleConstants.loopCycleTime, 0, 0);
 
     while (!drivePID.isSettled(driveError)){
-        driveError = targetDistance - (gearRatio * (VerticalTracker.position(turns) - startPosition) * M_PI * verticalWheelDiameter);
+        distanceTraveled = getVerticalTrackerPosition() - startPosition;
+        driveError = targetDistance - distanceTraveled;
         turnError = headingError(targetHeading, odom.orientation);
         
         driveOutput = drivePID.output(driveError);
@@ -222,11 +226,11 @@ void Drivetrain::driveDistance(double targetDistance, double targetHeading, clam
 
         //Clamps the output speeds to stay within the specified minimum and maximum speeds
         driveOutput *= driveOutputScale(driveClampConstants.minimumSpeed, driveClampConstants.maximumSpeed, driveOutput, driveOutput);
-        turnOutput *= driveOutputScale(defaultDriveDistanceTurnClampConstants.minimumSpeed, defaultDriveDistanceTurnClampConstants.maximumSpeed, turnOutput, turnOutput);
+        turnOutput *= driveOutputScale(defaultHeadingClampConstants.minimumSpeed, defaultHeadingClampConstants.maximumSpeed, turnOutput, turnOutput);
 
         leftSideOutput = driveOutput + turnOutput;
         rightSideOutput = driveOutput - turnOutput;
-
+        
         LeftDrive.spin(forward, percentToVolts(leftSideOutput), volt);
         RightDrive.spin(forward, percentToVolts(rightSideOutput), volt);
 
@@ -294,7 +298,6 @@ void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, clam
 
     turnToHeading(targetHeading, turnClampConstants, turnSettleConstants, turnOutputConstants);
 }
-
 
 void Drivetrain::swingToHeading(std::string driveSide, double targetHeading){
     swingToHeading(driveSide, targetHeading, defaultSwingClampConstants, defaultSwingSettleConstants, defaultSwingOutputConstants);

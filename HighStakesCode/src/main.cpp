@@ -193,9 +193,12 @@ void preAuton(){
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
 
+  task runIntake = task(controlIntake);
+  task runArm = task(controlArm);
+
   switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
-      runProgSkills();
+      runOdomTest();
       break;
     }
     case AutonRedSoloAWP: {
@@ -243,7 +246,6 @@ void autonomous(){
 void usercontrol(){
   while (true){
     if (!runningPreAuton){
-      static task colorSort = task(colorSort);
       runArcadeDrive(100, 100);
 
       runIntake();
