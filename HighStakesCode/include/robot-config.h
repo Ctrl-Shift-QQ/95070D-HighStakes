@@ -23,5 +23,6 @@ extern distance IntakeDistance;
 extern inertial Inertial;
 extern rotation HorizontalTracker;
 extern digital_out MogoMech;
-extern digital_out Doinker;
+extern digital_out LeftDoinker;
+extern digital_out RightDoinker;
 extern digital_out IntakeLift;

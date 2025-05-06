@@ -16,7 +16,6 @@ enum Auton {
 };
 
 extern std::string allianceColor;
-
+extern std::string matchStatus;
 extern Auton currentAuton;
-
 extern bool runningPreAuton; //Prevents driver control from running during pre-auton

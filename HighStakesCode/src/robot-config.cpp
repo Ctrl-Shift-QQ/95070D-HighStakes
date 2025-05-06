@@ -28,11 +28,12 @@ motor ArmMotor = motor(PORT3, ratio18_1, true);
 motor_group Arm(ArmMotor);
 rotation ArmRotation = rotation(PORT15, false);
 optical IntakeOptical = optical(PORT21);
-distance IntakeDistance = distance(PORT20);
+distance IntakeDistance = distance(PORT18);
 inertial Inertial = inertial(PORT12);
 rotation HorizontalTracker = rotation(PORT13, false);
 digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
-digital_out Doinker = digital_out(Brain.ThreeWirePort.G);
+digital_out LeftDoinker = digital_out(Brain.ThreeWirePort.A);
+digital_out RightDoinker = digital_out(Brain.ThreeWirePort.G);
 digital_out IntakeLift = digital_out(Brain.ThreeWirePort.B);
 
 

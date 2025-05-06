@@ -177,6 +177,7 @@ void runArcadeDrive(double percentSpeed, double steerPercentSpeed, bool toggleSp
 }
 
 void runIntake(){
+    IntakeLift.set(false);
     motorSeperateButton(INTAKE_DEFAULT_SPEED, Intake, INTAKE_FORWARD_BUTTON_ID, INTAKE_REVERSE_BUTTON_ID, INTAKE_STOP_BUTTON_ID);
 }
 
@@ -236,6 +237,6 @@ void runMogo(){
 }
 
 void runDoinker(){
-    pistonToggle(Doinker, DOINKER_BUTTON_ID);
+    pistonToggle(RightDoinker, DOINKER_BUTTON_ID);
 }
 

@@ -288,15 +288,37 @@ void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, clam
 
 void Drivetrain::turnToPoint(bool reversed, double targetX, double targetY, clampConstants turnClampConstants, settleConstants turnSettleConstants, outputConstants turnOutputConstants){
     double targetHeading = 0;
-
     if (reversed){
         targetHeading = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 540, 360);
     }
     else {
         targetHeading = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 360, 360);
     }
+    double turnError = headingError(targetHeading, odom.orientation);
+    double turnOutput = 0;
 
-    turnToHeading(targetHeading, turnClampConstants, turnSettleConstants, turnOutputConstants);
+    PID turnPID(turnError, turnOutputConstants.kp, turnOutputConstants.ki, turnOutputConstants.kd, turnOutputConstants.startI, 
+                           turnSettleConstants.deadband, turnSettleConstants.loopCycleTime, turnSettleConstants.settleTime, turnSettleConstants.timeout);
+
+    while (!turnPID.isSettled(turnError)){
+        if (reversed){
+            targetHeading = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 540, 360);
+        }
+        else {
+            targetHeading = fmod(radToDeg(atan2(targetX - odom.xPosition, targetY - odom.yPosition)) + 360, 360);
+        }
+        turnError = headingError(targetHeading, odom.orientation);
+
+        turnOutput = turnPID.output(turnError);
+
+        //Clamps the output speeds to stay within the specified minimum and maximum speeds
+        turnOutput *= driveOutputScale(turnClampConstants.minimumSpeed, turnClampConstants.maximumSpeed, turnOutput, -turnOutput);
+
+        LeftDrive.spin(forward, percentToVolts(turnOutput), volt);
+        RightDrive.spin(reverse, percentToVolts(turnOutput), volt);
+        
+        wait(turnSettleConstants.loopCycleTime, msec);
+    }
 }
 
 void Drivetrain::swingToHeading(std::string driveSide, double targetHeading){

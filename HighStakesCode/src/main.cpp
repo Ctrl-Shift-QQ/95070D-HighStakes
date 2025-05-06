@@ -18,9 +18,12 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
-bool runningPreAuton = true;
 std::string allianceColor = "Red";
+
+bool runningPreAuton = true;
 Auton currentAuton = AutonNone;
+
+std::string matchStatus;
 
 Drivetrain chassis(
 
@@ -193,12 +196,13 @@ void preAuton(){
 void autonomous(){
   double startTime = Brain.Timer.time(); //Records start time
 
+  matchStatus = "Auton";
+
   task runIntake = task(controlIntake);
   task runArm = task(controlArm);
 
   switch (currentAuton){ //Runs corresponding auton
     case AutonNone: {
-      runOdomTest();
       break;
     }
     case AutonRedSoloAWP: {
@@ -245,6 +249,8 @@ void autonomous(){
 
 void usercontrol(){
   while (true){
+    matchStatus = "Driver";
+
     if (!runningPreAuton){
       runArcadeDrive(100, 100);
 
@@ -267,7 +273,7 @@ int main(){
   Competition.autonomous(autonomous);
 
   preAuton();
-  
+
   while (true){
     wait(DEFAULT_LOOP_CYCLE_TIME, msec);
   }
