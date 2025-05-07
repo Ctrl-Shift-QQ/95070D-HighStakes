@@ -285,7 +285,7 @@ void runAutonRedSoloAWP(){
     MogoMech.set(false);
     chassis.driveDistance(10);
     chassis.turnToPoint(true, -24, -24);
-    chassis.driveToPoint(-24, -24, slowerDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
+    chassis.driveToPoint(-25, -23, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(true); //Mobile goal clamped
 
     intakeVelocity = INTAKE_DEFAULT_SPEED;
@@ -293,7 +293,7 @@ void runAutonRedSoloAWP(){
     chassis.driveToPoint(-24, -48); //One ring scored on mobile goal
 
     armAntiJam = false;
-    armPosition = ARM_UP_POSITION - 20;
+    armPosition = ARM_UP_POSITION - 25;
     chassis.driveToPoint(-12, -12, slowerDriveClamp); //Ladder Touched
 }
 
@@ -619,7 +619,7 @@ void runAutonBlueSoloAWP(){
     MogoMech.set(false);
     chassis.driveDistance(10);
     chassis.turnToPoint(true, 24, -24);
-    chassis.driveToPoint(24, -24, slowerDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
+    chassis.driveToPoint(25, -23, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(true); //Mobile goal clamped
 
     intakeVelocity = INTAKE_DEFAULT_SPEED;
@@ -627,7 +627,7 @@ void runAutonBlueSoloAWP(){
     chassis.driveToPoint(24, -48); //One ring scored on mobile goal
 
     armAntiJam = false;
-    armPosition = ARM_UP_POSITION - 20;
+    armPosition = ARM_UP_POSITION - 25;
     chassis.driveToPoint(12, -12, slowerDriveClamp); //Ladder Touched
 }
 
