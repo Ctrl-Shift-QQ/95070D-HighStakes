@@ -237,6 +237,10 @@ void runMogo(){
 }
 
 void runDoinker(){
-    pistonToggle(RightDoinker, DOINKER_BUTTON_ID);
+    pistonToggle(RightDoinker, DOINKER_RIGHT_BUTTON_ID);
+    pistonToggle(LeftDoinker, DOINKER_LEFT_BUTTON_ID);
 }
 
+void runTipper(){
+    pistonToggle(Tipper, TIPPER_BUTTON_ID);
+}

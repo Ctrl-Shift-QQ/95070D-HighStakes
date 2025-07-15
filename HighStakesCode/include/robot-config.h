@@ -26,3 +26,4 @@ extern digital_out MogoMech;
 extern digital_out LeftDoinker;
 extern digital_out RightDoinker;
 extern digital_out IntakeLift;
+extern digital_out Tipper;

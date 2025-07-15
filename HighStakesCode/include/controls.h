@@ -36,3 +36,4 @@ void runIntake();
 void runArm();
 void runMogo();
 void runDoinker();
+void runTipper();

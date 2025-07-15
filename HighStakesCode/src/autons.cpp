@@ -75,11 +75,8 @@ int controlIntake(){
             oppositeRGBValue = IntakeOptical.getRgb().blue;
         }
 
-        if (IntakeOptical.isNearObject()){
-            std::cout << IntakeOptical.getRgb().red << " "  << IntakeOptical.getRgb().green << " " << IntakeOptical.getRgb().blue << std::endl;
-        }
         if (sortRGBValue > oppositeRGBValue && IntakeOptical.isNearObject() && intakeVelocity != 0){ //Color sort
-            std::cout << "SORTED" << IntakeOptical.getRgb().red << " "  << IntakeOptical.getRgb().green << " " << IntakeOptical.getRgb().blue << std::endl;
+            std::cout << IntakeOptical.getRgb().red << " "  << IntakeOptical.getRgb().green << " " << IntakeOptical.getRgb().blue <<  " " << IntakeOptical.getRgb().clear << std::endl;
 
             while (IntakeDistance.objectDistance(inches) > SORT_DETECT_RING_RANGE){
                 wait(5, msec);
@@ -268,37 +265,39 @@ void runAutonRedSoloAWP(){
     chassis.stopDrive(coast);
     chassis.driveDistance(11, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
-    chassis.driveToPoint(-16, 32);
+    chassis.driveToPoint(-16, 30, slowerDriveClamp);
     chassis.turnToPoint(false, -24, 48);
     chassis.driveToPoint(-24, 48, chassis.defaultDriveClampConstants, shortDriveSettle); //Three rings scored on mogo
 
-    chassis.driveToPoint(-48, 40, slowerDriveClamp);
+    chassis.driveToPoint(-48, 30, slowerDriveClamp);
     armPosition = 0;
     chassis.turnToPoint(false, -48, 0);
     IntakeLift.set(true);
     chassis.driveToPoint(-48, 4, slowerDriveClamp, shortDriveSettle);
     IntakeLift.set(false);
-    chassis.driveDistance(-10); //Four rings scored on mogo
+    wait(200, msec);
+    chassis.driveDistance(-7); //Four rings scored on mogo
 
     intakeVelocity = 0;
-    MogoMech.set(false);
+    armAntiJam = false;
+    armPosition = 70;
     chassis.driveDistance(10);
+    MogoMech.set(false);
     chassis.turnToPoint(true, -24, -24);
     chassis.driveToPoint(-25, -23, clampMogoDriveClamp, clampMogoDriveSettle, clampMogoDriveOutput);
     MogoMech.set(true); //Mobile goal clamped
 
     intakeVelocity = INTAKE_DEFAULT_SPEED;
-    chassis.turnToPoint(false, -24, -50);
-    chassis.driveToPoint(-24, -50); //One ring scored on mobile goal
+    chassis.turnToPoint(false, -22, -48);
+    chassis.driveToPoint(-22, -48); //One ring scored on mobile goal
 
-    armAntiJam = false;
-    armPosition = 70;
     chassis.driveToPoint(-12, -12, slowerDriveClamp); //Ladder Touched
 
     chassis.stopDrive(coast);
 }
 
 void runAutonRedRushAWP(){
+    LeftDoinker.set(true);
     intakeVelocity = 95;
 }
 
@@ -361,26 +360,25 @@ void runAutonRedStackAWP(){
     chassis.driveToPoint(-9, 39); //One ring scored on mogo
 
     chassis.stopDrive(brake);
-    wait(200, msec);
+    wait(300, msec);
     chassis.stopDrive(coast);
     chassis.swingToHeading("Right", 0, chassis.defaultTurnClampConstants, chassis.defaultTurnSettleConstants);
     chassis.stopDrive(coast);
     chassis.driveDistance(11, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
-    chassis.driveToPoint(-16, 32);
+    chassis.driveToPoint(-16, 30, slowerDriveClamp);
     chassis.turnToPoint(false, -24, 48);
     chassis.driveToPoint(-22, 48, chassis.defaultDriveClampConstants, shortDriveSettle); //Three rings scored on mogo
 
     wait(100, msec);
-    chassis.driveToPoint(-55, 55);
+    chassis.driveToPoint(-53, 55);
     chassis.turnToPoint(false, -68, 68);
-    wait(100, msec);
     intakeVelocity = -INTAKE_DEFAULT_SPEED;
     armAntiJam = false;
     armPosition = 145;
-    chassis.driveDistance(15.5, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
+    chassis.driveDistance(16, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
     intakeVelocity = INTAKE_DEFAULT_SPEED;
-    wait(500, msec);
+    wait(600, msec);
     chassis.driveDistance(-20);
     chassis.driveDistance(15, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle); //Five rings scored on mogo
 
@@ -392,9 +390,7 @@ void runAutonRedStackAWP(){
     IntakeLift.set(false);
     chassis.driveDistance(-10); //Six rings scored on mogo
 
-    chassis.turnToPoint(false, -24, 0);
-    armPosition = ARM_DESCORE_POSITION;
-    chassis.driveDistance(20, chassis.odom.orientation, slowerDriveClamp); //Ladder touched
+    chassis.turnToPoint(false, -66, 66); //Facing corner
 
     chassis.stopDrive(coast);
 }
@@ -462,11 +458,11 @@ void runAutonRedGoalRush(){
     Drivetrain::settleConstants ramDriveSettle;
     ramDriveSettle.deadband = 1.5;
     ramDriveSettle.loopCycleTime = 20;
-    ramDriveSettle.settleTime = 800;
-    ramDriveSettle.timeout = 800;
+    ramDriveSettle.settleTime = 1500;
+    ramDriveSettle.timeout = 1500;
 
     LeftDoinker.set(true);
-    chassis.driveToPoint(-14, -60, goalRushDriveClamp);
+    chassis.driveToPoint(-14, -58.5, goalRushDriveClamp);
     wait(75, msec);
     LeftDoinker.set(false); //Goal rushed
 
@@ -503,24 +499,12 @@ void runAutonRedGoalRush(){
     wait(150, msec);
     chassis.turnToPoint(false, -48, 0);
     IntakeLift.set(true);
-    chassis.driveDistance(16, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle);
+    chassis.driveToPoint(-42, -1, slowerDriveClamp, shortDriveSettle);
     IntakeLift.set(false); //Four rings scored on mogo
 
-    chassis.turnToPoint(false, -48, -48);
-    chassis.driveToPoint(-48, -48);
-    chassis.turnToPoint(false, -66, -66);
-    wait(250, msec);
-    intakeVelocity = -INTAKE_DEFAULT_SPEED;
-    armAntiJam = false;
-    armPosition = 130;
-    chassis.driveDistance(23, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
-    intakeVelocity = INTAKE_DEFAULT_SPEED;
-    wait(400, msec);
-    chassis.driveDistance(-16);
-    chassis.driveDistance(15, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle); //Six rings scored on mogo
+    wait(300, msec);
+    chassis.driveDistance(-8);
 
-    chassis.turnToPoint(false, 0, -36); 
-    MogoMech.set(false);
     chassis.stopDrive(brake); //Stops near rushed goal
 }
 
@@ -593,7 +577,7 @@ void runAutonBlueSoloAWP(){
     chassis.stopDrive(coast);
     chassis.driveDistance(11, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
-    chassis.driveToPoint(16, 32);
+    chassis.driveToPoint(16, 30, slowerDriveClamp);
     chassis.turnToPoint(false, 24, 48);
     chassis.driveToPoint(24, 48, chassis.defaultDriveClampConstants, shortDriveSettle); //Three rings scored on mogo
 
@@ -603,9 +587,12 @@ void runAutonBlueSoloAWP(){
     IntakeLift.set(true);
     chassis.driveToPoint(48, 4, slowerDriveClamp, shortDriveSettle);
     IntakeLift.set(false);
+    wait(100, msec);
     chassis.driveDistance(-10); //Four rings scored on mogo
 
     intakeVelocity = 0;
+    armAntiJam = false;
+    armPosition = 70;
     MogoMech.set(false);
     chassis.driveDistance(10);
     chassis.turnToPoint(true, 24, -24);
@@ -613,18 +600,16 @@ void runAutonBlueSoloAWP(){
     MogoMech.set(true); //Mobile goal clamped
 
     intakeVelocity = INTAKE_DEFAULT_SPEED;
-    chassis.turnToPoint(false, 24, -50);
+    chassis.turnToPoint(false, 24, -48);
     chassis.driveToPoint(24, -50); //One ring scored on mobile goal
 
-    armAntiJam = false;
-    armPosition = 70;
     chassis.driveToPoint(12, -12, slowerDriveClamp); //Ladder Touched
 
     chassis.stopDrive(coast);
 }
 
 void runAutonBlueRushAWP(){
-    intakeVelocity = 0;
+    intakeVelocity = 95;
 }
 
 void runAutonBlueStackAWP(){
@@ -656,7 +641,7 @@ void runAutonBlueStackAWP(){
     clampMogoDriveOutput.ki = 0;
     clampMogoDriveOutput.kd = 0.05;
     clampMogoDriveOutput.startI = 0;
-    
+     
     Drivetrain::clampConstants slowerDriveClamp;
     slowerDriveClamp.minimumSpeed = 0;
     slowerDriveClamp.maximumSpeed = 65;
@@ -686,26 +671,25 @@ void runAutonBlueStackAWP(){
     chassis.driveToPoint(9, 39); //One ring scored on mogo
 
     chassis.stopDrive(brake);
-    wait(200, msec);
+    wait(300, msec);
     chassis.stopDrive(coast);
     chassis.swingToHeading("Left", 0, chassis.defaultTurnClampConstants, chassis.defaultTurnSettleConstants);
     chassis.stopDrive(coast);
     chassis.driveDistance(11, 0, chassis.defaultDriveClampConstants, shortDriveSettle); //Two rings scored on mogo
 
-    chassis.driveToPoint(16, 32);
+    chassis.driveToPoint(16, 30, slowerDriveClamp);
     chassis.turnToPoint(false, 24, 48);
     chassis.driveToPoint(22, 48, chassis.defaultDriveClampConstants, shortDriveSettle); //Three rings scored on mogo
 
     wait(100, msec);
-    chassis.driveToPoint(55, 55);
+    chassis.driveToPoint(53, 55);
     chassis.turnToPoint(false, 68, 68);
-    wait(100, msec);
     intakeVelocity = -INTAKE_DEFAULT_SPEED;
     armAntiJam = false;
     armPosition = 145;
-    chassis.driveDistance(15.5, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
+    chassis.driveDistance(16, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
     intakeVelocity = INTAKE_DEFAULT_SPEED;
-    wait(500, msec);
+    wait(600, msec);
     chassis.driveDistance(-20);
     chassis.driveDistance(15, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle); //Five rings scored on mogo
 
@@ -717,9 +701,7 @@ void runAutonBlueStackAWP(){
     IntakeLift.set(false);
     chassis.driveDistance(-10); //Six rings scored on mogo
 
-    chassis.turnToPoint(false, 24, 0);
-    armPosition = ARM_DESCORE_POSITION;
-    chassis.driveDistance(20, chassis.odom.orientation, slowerDriveClamp); //Ladder touched
+    chassis.turnToPoint(false, 66, 66);
 
     chassis.stopDrive(coast);
 }
@@ -828,24 +810,18 @@ void runAutonBlueGoalRush(){
     wait(150, msec);
     chassis.turnToPoint(false, 48, 0);
     IntakeLift.set(true);
-    chassis.driveDistance(16, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle);
+        chassis.driveToPoint(42, -1, slowerDriveClamp, shortDriveSettle);
     IntakeLift.set(false); //Four rings scored on mogo
 
-    chassis.turnToPoint(false, 48, -48);
-    chassis.driveToPoint(48, -48);
+    chassis.stopDrive(brake);
+    wait(300, msec);
+    chassis.stopDrive(coast);
+    chassis.driveDistance(-8);
     chassis.turnToPoint(false, 66, -66);
-    wait(250, msec);
-    intakeVelocity = -INTAKE_DEFAULT_SPEED;
-    armAntiJam = false;
-    armPosition = 130;
-    chassis.driveDistance(23, chassis.odom.orientation, ramDriveClamp, ramDriveSettle);
-    intakeVelocity = INTAKE_DEFAULT_SPEED;
-    wait(400, msec);
-    chassis.driveDistance(-16);
-    chassis.driveDistance(15, chassis.odom.orientation, slowerDriveClamp, shortDriveSettle); //Six rings scored on mogo
-
-    chassis.turnToPoint(false, 0, -36);
-    MogoMech.set(false);
+    intakeVelocity = 0;
+    chassis.driveDistance(47, chassis.odom.orientation, slowerDriveClamp);
+    LeftDoinker.set(true);
+    chassis.turnToPoint(false, 0, -48);
     chassis.stopDrive(brake); //Stops near rushed goal
 }
 

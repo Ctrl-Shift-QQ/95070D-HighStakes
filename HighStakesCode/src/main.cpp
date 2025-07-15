@@ -262,6 +262,8 @@ void usercontrol(){
       runMogo();
 
       runDoinker();
+
+      runTipper();
     }
     
     wait(DEFAULT_LOOP_CYCLE_TIME, msec); 

@@ -35,6 +35,7 @@ digital_out MogoMech = digital_out(Brain.ThreeWirePort.H);
 digital_out LeftDoinker = digital_out(Brain.ThreeWirePort.A);
 digital_out RightDoinker = digital_out(Brain.ThreeWirePort.G);
 digital_out IntakeLift = digital_out(Brain.ThreeWirePort.B);
+digital_out Tipper = digital_out(Brain.ThreeWirePort.C);
 
 
 // VEXcode generated functions
